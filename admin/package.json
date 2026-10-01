@@ -11,6 +11,7 @@
     "bcryptjs": "^3.0.2",
     "express": "^5.1.0",
     "express-session": "^1.18.2",
-    "helmet": "^8.1.0"
+    "helmet": "^8.1.0",
+    "pg": "^8.16.3"
   }
 }
