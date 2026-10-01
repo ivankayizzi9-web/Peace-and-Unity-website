@@ -105,20 +105,31 @@ app.post("/login", async (req, res) => {
 app.post("/logout", requireAuth, (req, res) => req.session.destroy(() => res.redirect("/login")));
 
 app.get("/dashboard", requireAuth, async (req, res) => {
-  let story = "", storageReady = Boolean(pool);
-  if (pool) { try { story = await getContent("story"); } catch (_) { storageReady = false; } }
+  let story = "", contact = DEFAULT_CONTACT, donations = DEFAULT_DONATIONS, storageReady = Boolean(pool);
+  if (pool) { try { story = await getContent("story"); contact = await getContent("contact"); donations = await getContent("donations"); } catch (_) { storageReady = false; } }
   const safeStory = String(story || "").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
   res.type("html").send(`<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Peace & Unity — Dashboard</title>
-<style>body{margin:0;background:#f5f2e9;color:#17352d;font-family:Arial,sans-serif}.wrap{max-width:1000px;margin:auto;padding:30px 22px}h1{font:46px Georgia,serif;margin:0}.muted{color:#69766e;line-height:1.6}.card{background:#fffdf8;border:1px solid #dfe4d8;border-radius:18px;padding:25px;margin-top:22px}.card h2{font:28px Georgia,serif;margin:0 0 8px}textarea{width:100%;box-sizing:border-box;min-height:360px;padding:16px;border:1px solid #dfe4d8;border-radius:12px;font:15px/1.7 Arial,sans-serif;resize:vertical}button{padding:11px 18px;border:0;border-radius:999px;background:#27634e;color:white;font-weight:700;cursor:pointer}.top{display:flex;justify-content:space-between;align-items:center;gap:15px}.notice{padding:12px 15px;border-radius:10px;background:#fff5d8;margin:15px 0}@media(max-width:650px){h1{font-size:38px}.top{align-items:flex-start;flex-direction:column}}</style></head><body><div class="wrap">
+<style>body{margin:0;background:#f5f2e9;color:#17352d;font-family:Arial,sans-serif}.wrap{max-width:1000px;margin:auto;padding:30px 22px}h1{font:46px Georgia,serif;margin:0}.muted{color:#69766e;line-height:1.6}.card{background:#fffdf8;border:1px solid #dfe4d8;border-radius:18px;padding:25px;margin-top:22px}.card h2{font:28px Georgia,serif;margin:0 0 8px}input{width:100%;box-sizing:border-box;padding:12px;border:1px solid #dfe4d8;border-radius:9px;font-size:14px;margin:5px 0 10px}label{display:block;font-size:12px;font-weight:700;margin-top:10px}textarea{width:100%;box-sizing:border-box;min-height:360px;padding:16px;border:1px solid #dfe4d8;border-radius:12px;font:15px/1.7 Arial,sans-serif;resize:vertical}button{padding:11px 18px;border:0;border-radius:999px;background:#27634e;color:white;font-weight:700;cursor:pointer}.top{display:flex;justify-content:space-between;align-items:center;gap:15px}.notice{padding:12px 15px;border-radius:10px;background:#fff5d8;margin:15px 0}@media(max-width:650px){h1{font-size:38px}.top{align-items:flex-start;flex-direction:column}}</style></head><body><div class="wrap">
 <div class="top"><div><div style="font-size:26px">🌱</div><h1>Admin Dashboard</h1><p class="muted">Private Peace &amp; Unity management area.</p></div><form method="post" action="/logout"><button type="submit">Log out</button></form></div>
 ${storageReady ? "" : `<div class="notice">Content storage is not connected yet. The database must be linked to this Render service.</div>`}
 <div class="card"><h2>Stories</h2><p class="muted">Edit the main story shown on the Peace &amp; Unity website.</p><form method="post" action="/admin/story"><textarea name="story" required>${safeStory}</textarea><br><button type="submit">Save story</button></form></div>
-<div class="card"><h2>Media</h2><p class="muted">Photo and video management is the next section we will add.</p></div><div class="card"><h2>Contact</h2><p class="muted">Your public contact details will be editable here next.</p></div><div class="card"><h2>Donations</h2><p class="muted">Your donation information will be editable here next.</p></div>
+<div class="card"><h2>Contact</h2><p class="muted">Update the public email address and WhatsApp number.</p><form method="post" action="/admin/contact"><label>Email</label><input name="email" type="email" value="${JSON.parse(contact).email || ""}" required><label>WhatsApp</label><input name="whatsapp" value="${JSON.parse(contact).whatsapp || ""}" required><br><button type="submit">Save contact</button></form></div>
+<div class="card"><h2>Donations</h2><p class="muted">Update the public bank and mobile money donation details.</p><form method="post" action="/admin/donations"><label>Airtel Money</label><input name="airtelMoney" value="${JSON.parse(donations).airtelMoney || ""}" required><label>Account name</label><input name="accountName" value="${JSON.parse(donations).accountName || ""}" required><label>Bank</label><input name="bank" value="${JSON.parse(donations).bank || ""}" required><label>Account number</label><input name="accountNumber" value="${JSON.parse(donations).accountNumber || ""}" required><label>Currency</label><input name="currency" value="${JSON.parse(donations).currency || ""}" required><br><button type="submit">Save donation details</button></form></div><div class="card"><h2>Media</h2><p class="muted">Photo and video management is the next section we will add.</p></div>
 </div></body></html>`);
 });
 
 app.post("/admin/story", requireAuth, async (req, res) => {
   try { await saveContent("story", String(req.body.story || "").trim()); res.redirect("/dashboard?saved=story"); }
+  catch (error) { res.status(503).send('Content storage is not connected yet. <a href="/dashboard">Back to dashboard</a>.'); }
+});
+
+app.post("/admin/contact", requireAuth, async (req, res) => {
+  try { await saveContent("contact", JSON.stringify({ email: String(req.body.email || "").trim(), whatsapp: String(req.body.whatsapp || "").trim() })); res.redirect("/dashboard?saved=contact"); }
+  catch (error) { res.status(503).send('Content storage is not connected yet. <a href="/dashboard">Back to dashboard</a>.'); }
+});
+
+app.post("/admin/donations", requireAuth, async (req, res) => {
+  try { await saveContent("donations", JSON.stringify({ airtelMoney: String(req.body.airtelMoney || "").trim(), accountName: String(req.body.accountName || "").trim(), bank: String(req.body.bank || "").trim(), accountNumber: String(req.body.accountNumber || "").trim(), currency: String(req.body.currency || "").trim() })); res.redirect("/dashboard?saved=donations"); }
   catch (error) { res.status(503).send('Content storage is not connected yet. <a href="/dashboard">Back to dashboard</a>.'); }
 });
 
