@@ -75,7 +75,7 @@ function loginRateLimit(req, res, next) {
   next();
 }
 
-function configured() { return Boolean((ADMIN_PASSWORD_HASH || ADMIN_PASSWORD) && SESSION_SECRET); }
+async function configured() { return Boolean((await hasAdminPassword()) && SESSION_SECRET); }
 function requireAuth(req, res, next) { if (!req.session.authenticated) return res.redirect("/login"); next(); }
 
 async function initDatabase() {
@@ -85,6 +85,22 @@ async function initDatabase() {
   await pool.query("INSERT INTO content(key,value) VALUES($1,$2) ON CONFLICT(key) DO NOTHING", ["contact", DEFAULT_CONTACT]);
   await pool.query("INSERT INTO content(key,value) VALUES($1,$2) ON CONFLICT(key) DO NOTHING", ["donations", DEFAULT_DONATIONS]);
   await pool.query("INSERT INTO content(key,value) VALUES($1,$2) ON CONFLICT(key) DO NOTHING", ["media", "[]"]);
+}
+
+async function getStoredPasswordHash() {
+  if (!pool) return "";
+  const result = await pool.query("SELECT value FROM admin_config WHERE key=$1", ["password_hash"]);
+  return result.rows[0]?.value ?? "";
+}
+
+async function setStoredPasswordHash(hash) {
+  if (!pool) return;
+  await pool.query("INSERT INTO admin_config(key,value,updated_at) VALUES($1,$2,NOW()) ON CONFLICT(key) DO UPDATE SET value=EXCLUDED.value, updated_at=NOW()", ["password_hash", hash]);
+}
+
+async function hasAdminPassword() {
+  if (ADMIN_PASSWORD_HASH || ADMIN_PASSWORD) return true;
+  try { return Boolean(await getStoredPasswordHash()); } catch (_) { return false; }
 }
 
 async function getContent(key) {
@@ -101,7 +117,7 @@ async function saveContent(key, value) {
 app.get("/health", async (req, res) => {
   let database = false;
   if (pool) { try { await pool.query("SELECT 1"); database = true; } catch (_) {} }
-  res.status(200).json({ ok: true, service: "Peace & Unity Admin", configured: configured(), database, passwordHashConfigured: Boolean(ADMIN_PASSWORD_HASH), sessionStore: pool ? "postgres" : "memory" });
+  res.status(200).json({ ok: true, service: "Peace & Unity Admin", configured: await configured(), database, passwordHashConfigured: Boolean(ADMIN_PASSWORD_HASH || (await getStoredPasswordHash().catch(() => ""))), sessionStore: pool ? "postgres" : "memory" });
 });
 
 app.get("/api/content", async (req, res) => {
@@ -114,23 +130,28 @@ app.get("/api/content", async (req, res) => {
 
 app.get("/", (req, res) => req.session.authenticated ? res.redirect("/dashboard") : res.redirect("/login"));
 
-app.get("/login", (req, res) => {
+app.get("/login", async (req, res) => {
   res.type("html").send(`<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Peace & Unity — Admin Login</title>
 <style>body{margin:0;background:#f5f2e9;color:#17352d;font-family:Arial,sans-serif;min-height:100vh;display:grid;place-items:center;padding:20px}.card{width:min(420px,100%);background:#fffdf8;padding:34px;border-radius:20px;box-shadow:0 18px 50px #17352d18}h1{font:40px Georgia,serif;margin:0 0 8px}.muted{color:#69766e;line-height:1.6;font-size:14px}label{display:block;font-size:12px;font-weight:700;margin:20px 0 7px}input{width:100%;box-sizing:border-box;padding:13px;border:1px solid #dfe4d8;border-radius:9px;font-size:14px}button{width:100%;margin-top:22px;padding:14px;border:0;border-radius:999px;background:#27634e;color:#fff;font-weight:700;cursor:pointer}.note{margin-top:18px;font-size:11px;color:#69766e}</style></head><body><main class="card"><div style="font-size:28px">🌱</div><h1>Admin login</h1><p class="muted">Private management area for Peace &amp; Unity.</p>
-${configured() ? `<form method="post" action="/login"><input type="hidden" name="_csrf" value="${req.session.csrfToken}"><label for="email">Email</label><input id="email" name="email" type="email" autocomplete="username" required><label for="password">Password</label><input id="password" name="password" type="password" autocomplete="current-password" required><button type="submit">Sign in</button></form>` : `<p class="muted"><strong>Admin setup is not finished yet.</strong><br>Please configure the admin password in Render before signing in.</p>`}<p class="note">Your password is never stored in this website's public files.</p></main></body></html>`);
+${(await configured()) ? `<form method="post" action="/login"><input type="hidden" name="_csrf" value="${req.session.csrfToken}"><label for="email">Email</label><input id="email" name="email" type="email" autocomplete="username" required><label for="password">Password</label><input id="password" name="password" type="password" autocomplete="current-password" required><button type="submit">Sign in</button></form>` : `<p class="muted"><strong>Admin setup is not finished yet.</strong><br>Please configure the admin password in Render before signing in.</p>`}<p class="note">Your password is never stored in this website's public files.</p></main></body></html>`);
 });
 
 app.post("/login", loginRateLimit, requireCsrf, async (req, res) => {
-  if (!configured()) return res.status(503).send("Admin setup is incomplete.");
+  if (!(await configured())) return res.status(503).send("Admin setup is incomplete.");
   const email = String(req.body.email || "").trim().toLowerCase();
   const password = String(req.body.password || "");
   const emailOk = email === ADMIN_EMAIL.toLowerCase();
   let passwordOk = false;
   if (emailOk) {
-    if (ADMIN_PASSWORD_HASH) passwordOk = await bcrypt.compare(password, ADMIN_PASSWORD_HASH);
+    const storedHash = await getStoredPasswordHash().catch(() => "");
+    if (storedHash) passwordOk = await bcrypt.compare(password, storedHash);
+    else if (ADMIN_PASSWORD_HASH) passwordOk = await bcrypt.compare(password, ADMIN_PASSWORD_HASH);
     else if (ADMIN_PASSWORD) passwordOk = password === ADMIN_PASSWORD;
   }
   if (!passwordOk) return res.status(401).send('Invalid login details. <a href="/login">Try again</a>.');
+  if (!await getStoredPasswordHash().catch(() => "")) {
+    try { await setStoredPasswordHash(await bcrypt.hash(password, 12)); } catch (_) {}
+  }
   loginAttempts.delete(req.ip || "unknown");
   req.session.regenerate(error => {
     if (error) return res.status(500).send("Unable to start a secure session.");
