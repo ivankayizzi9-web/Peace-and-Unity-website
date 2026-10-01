@@ -209,6 +209,27 @@ async function loadPeaceAndUnityContent(){
       });
     }
 
+    if(data.media){
+      let mediaItems=[];
+      try{mediaItems=JSON.parse(data.media)||[];}catch(_){mediaItems=[];}
+      const mediaSection=document.querySelector("#media");
+      if(mediaSection && mediaItems.length){
+        const grid=mediaSection.querySelector(".media-grid") || mediaSection.querySelector(".grid");
+        if(grid){
+          grid.innerHTML="";
+          mediaItems.forEach(item=>{
+            const card=document.createElement("article"); card.className="media-card";
+            const type=["image","video","story"].includes(item.type)?item.type:"story";
+            if(type==="image"){const img=document.createElement("img"); img.src=item.url; img.alt=item.title||"Peace & Unity"; img.loading="lazy"; img.style.width="100%"; img.style.borderRadius="16px"; card.appendChild(img);}
+            else if(type==="video"){const video=document.createElement("video"); video.src=item.url; video.controls=true; video.preload="metadata"; video.style.width="100%"; video.style.borderRadius="16px"; card.appendChild(video);}
+            const body=document.createElement("div"); body.className="media-body"; const h3=document.createElement("h3"); h3.textContent=item.title||"Peace & Unity"; body.appendChild(h3);
+            if(item.description){const p=document.createElement("p"); p.textContent=item.description; body.appendChild(p);}
+            if(type==="story"){const link=document.createElement("a"); link.href=item.url; link.target="_blank"; link.rel="noopener"; link.textContent="Read story →"; body.appendChild(link);}
+            card.appendChild(body); grid.appendChild(card);
+          });
+        }
+      }
+    }
     if(data.story){
       const storyText=String(data.story).trim();
       const makeParagraphs=(container, beforeSelector)=>{
