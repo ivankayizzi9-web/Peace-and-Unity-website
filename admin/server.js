@@ -63,6 +63,15 @@ function requireCsrf(req, res, next) {
   next();
 }
 
+function requireSameOrigin(req, res, next) {
+  const origin = String(req.get("origin") || "").replace(/\/$/, "");
+  const referer = String(req.get("referer") || "");
+  const allowed = "https://peace-and-unity-admin.onrender.com";
+  if (origin && origin !== allowed) return res.status(403).send("Security check failed. Please go back and try again.");
+  if (!origin && referer && !referer.startsWith(allowed + "/")) return res.status(403).send("Security check failed. Please go back and try again.");
+  next();
+}
+
 const loginAttempts = new Map();
 function loginRateLimit(req, res, next) {
   const now = Date.now();
@@ -81,6 +90,7 @@ function requireAuth(req, res, next) { if (!req.session.authenticated) return re
 async function initDatabase() {
   if (!pool) return;
   await pool.query(`CREATE TABLE IF NOT EXISTS content (key TEXT PRIMARY KEY, value TEXT NOT NULL, updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW())`);
+  await pool.query(`CREATE TABLE IF NOT EXISTS admin_config (key TEXT PRIMARY KEY, value TEXT NOT NULL, updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW())`);
   await pool.query("INSERT INTO content(key,value) VALUES($1,$2) ON CONFLICT(key) DO NOTHING", ["story", DEFAULT_STORY]);
   await pool.query("INSERT INTO content(key,value) VALUES($1,$2) ON CONFLICT(key) DO NOTHING", ["contact", DEFAULT_CONTACT]);
   await pool.query("INSERT INTO content(key,value) VALUES($1,$2) ON CONFLICT(key) DO NOTHING", ["donations", DEFAULT_DONATIONS]);
@@ -136,7 +146,7 @@ app.get("/login", async (req, res) => {
 ${(await configured()) ? `<form method="post" action="/login"><input type="hidden" name="_csrf" value="${req.session.csrfToken}"><label for="email">Email</label><input id="email" name="email" type="email" autocomplete="username" required><label for="password">Password</label><input id="password" name="password" type="password" autocomplete="current-password" required><button type="submit">Sign in</button></form>` : `<p class="muted"><strong>Admin setup is not finished yet.</strong><br>Please configure the admin password in Render before signing in.</p>`}<p class="note">Your password is never stored in this website's public files.</p></main></body></html>`);
 });
 
-app.post("/login", loginRateLimit, requireCsrf, async (req, res) => {
+app.post("/login", loginRateLimit, requireSameOrigin, async (req, res) => {
   if (!(await configured())) return res.status(503).send("Admin setup is incomplete.");
   const email = String(req.body.email || "").trim().toLowerCase();
   const password = String(req.body.password || "");
