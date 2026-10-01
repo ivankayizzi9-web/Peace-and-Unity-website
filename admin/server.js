@@ -6,8 +6,8 @@ const bcrypt = require("bcryptjs");
 const app = express();
 const PORT = process.env.PORT || 10000;
 const ADMIN_EMAIL = process.env.ADMIN_EMAIL || "peaceandunity42@gmail.com";
-const ADMIN_PASSWORD_HASH = process.env.ADMIN_PASSWORD_HASH || "";
-const SESSION_SECRET = process.env.SESSION_SECRET || "";
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "";
+const SESSION_SECRET = process.env.SESSION_SECRET || require("crypto").randomBytes(32).toString("hex");
 
 app.set("trust proxy", 1);
 app.use(helmet());
@@ -27,7 +27,7 @@ app.use(session({
 }));
 
 function configured() {
-  return Boolean(ADMIN_PASSWORD_HASH && SESSION_SECRET);
+  return Boolean(ADMIN_PASSWORD && SESSION_SECRET);
 }
 
 function requireAuth(req, res, next) {
@@ -66,7 +66,7 @@ button{width:100%;margin-top:22px;padding:14px;border:0;border-radius:999px;back
 ${configured() ? `<form method="post" action="/login">
 <label for="email">Email</label><input id="email" name="email" type="email" autocomplete="username" required>
 <label for="password">Password</label><input id="password" name="password" type="password" autocomplete="current-password" required>
-<button type="submit">Sign in</button></form>` : `<p class="muted"><strong>Admin setup is not finished yet.</strong><br>Please configure the admin password and session secret in Render before signing in.</p>`}
+<button type="submit">Sign in</button></form>` : `<p class="muted"><strong>Admin setup is not finished yet.</strong><br>Please configure the admin password in Render before signing in.</p>`}
 <p class="note">Your password is never stored in this website's public files.</p></main></body></html>`);
 });
 
@@ -75,7 +75,7 @@ app.post("/login", async (req, res) => {
   const email = String(req.body.email || "").trim().toLowerCase();
   const password = String(req.body.password || "");
   const emailOk = email === ADMIN_EMAIL.toLowerCase();
-  const passwordOk = emailOk && await bcrypt.compare(password, ADMIN_PASSWORD_HASH);
+  const passwordOk = emailOk && await bcrypt.compare(password, await bcrypt.hash(ADMIN_PASSWORD, 12));
   if (!passwordOk) return res.status(401).send("Invalid login details. <a href="/login">Try again</a>.");
   req.session.authenticated = true;
   res.redirect("/dashboard");
