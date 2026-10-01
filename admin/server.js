@@ -76,7 +76,7 @@ app.post("/login", async (req, res) => {
   const password = String(req.body.password || "");
   const emailOk = email === ADMIN_EMAIL.toLowerCase();
   const passwordOk = emailOk && await bcrypt.compare(password, await bcrypt.hash(ADMIN_PASSWORD, 12));
-  if (!passwordOk) return res.status(401).send("Invalid login details. <a href="/login">Try again</a>.");
+  if (!passwordOk) return res.status(401).send('Invalid login details. <a href="/login">Try again</a>.');
   req.session.authenticated = true;
   res.redirect("/dashboard");
 });
