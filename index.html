@@ -224,7 +224,7 @@ async function loadPeaceAndUnityContent(){
             else if(type==="video"){const video=document.createElement("video"); video.src=item.url; video.controls=true; video.preload="metadata"; video.style.width="100%"; video.style.borderRadius="16px"; card.appendChild(video);}
             const body=document.createElement("div"); body.className="media-body"; const h3=document.createElement("h3"); h3.textContent=item.title||"Peace & Unity"; body.appendChild(h3);
             if(item.description){const p=document.createElement("p"); p.textContent=item.description; body.appendChild(p);}
-            if(type==="story"){const link=document.createElement("a"); link.href=item.url; link.target="_blank"; link.rel="noopener"; link.textContent="Read story →"; body.appendChild(link);}
+            if(type==="story"){const link=document.createElement("a"); link.className="media-link"; link.href="#tears-behind-our-smiles"; link.textContent="Read story →"; body.appendChild(link);}
             card.appendChild(body); grid.appendChild(card);
           });
         }
