@@ -31,6 +31,12 @@ const DEFAULT_DONATIONS = JSON.stringify({ airtelMoney: "+256 742 119 378", acco
 
 app.set("trust proxy", 1);
 app.use(helmet());
+app.use((req, res, next) => {
+  res.setHeader("Access-Control-Allow-Origin", "https://peace-and-unity-website.onrender.com");
+  res.setHeader("Access-Control-Allow-Methods", "GET, OPTIONS");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+  next();
+});
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 
