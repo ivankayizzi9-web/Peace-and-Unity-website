@@ -26,18 +26,8 @@ That is one of the reasons I created Peace & Unity: to help people who cannot af
 
 Peace & Unity — Together We Can Make a Difference.`;
 
-const DEFAULT_CONTACT = JSON.stringify({
-  email: "peaceandunity42@gmail.com",
-  whatsapp: "+256 742 119 378"
-});
-
-const DEFAULT_DONATIONS = JSON.stringify({
-  airtelMoney: "+256 742 119 378",
-  accountName: "Ivan Kayizzi",
-  bank: "Equity Bank",
-  accountNumber: "1003101355426",
-  currency: "UGX"
-});
+const DEFAULT_CONTACT = JSON.stringify({ email: "peaceandunity42@gmail.com", whatsapp: "+256 742 119 378" });
+const DEFAULT_DONATIONS = JSON.stringify({ airtelMoney: "+256 742 119 378", accountName: "Ivan Kayizzi", bank: "Equity Bank", accountNumber: "1003101355426", currency: "UGX" });
 
 app.set("trust proxy", 1);
 app.use(helmet());
@@ -48,44 +38,18 @@ app.use(session({
   secret: SESSION_SECRET,
   resave: false,
   saveUninitialized: false,
-  cookie: {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "lax",
-    maxAge: 1000 * 60 * 60 * 8
-  }
+  cookie: { httpOnly: true, secure: process.env.NODE_ENV === "production", sameSite: "lax", maxAge: 1000 * 60 * 60 * 8 }
 }));
 
-function configured() {
-  return Boolean(ADMIN_PASSWORD && SESSION_SECRET);
-}
-
-function requireAuth(req, res, next) {
-  if (!req.session.authenticated) return res.redirect("/login");
-  next();
-}
+function configured() { return Boolean(ADMIN_PASSWORD && SESSION_SECRET); }
+function requireAuth(req, res, next) { if (!req.session.authenticated) return res.redirect("/login"); next(); }
 
 async function initDatabase() {
   if (!pool) return;
-  await pool.query(`
-    CREATE TABLE IF NOT EXISTS content (
-      key TEXT PRIMARY KEY,
-      value TEXT NOT NULL,
-      updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
-    )
-  `);
-  await pool.query(
-    "INSERT INTO content(key,value) VALUES($1,$2) ON CONFLICT(key) DO NOTHING",
-    ["story", DEFAULT_STORY]
-  );
-  await pool.query(
-    "INSERT INTO content(key,value) VALUES($1,$2) ON CONFLICT(key) DO NOTHING",
-    ["contact", DEFAULT_CONTACT]
-  );
-  await pool.query(
-    "INSERT INTO content(key,value) VALUES($1,$2) ON CONFLICT(key) DO NOTHING",
-    ["donations", DEFAULT_DONATIONS]
-  );
+  await pool.query(`CREATE TABLE IF NOT EXISTS content (key TEXT PRIMARY KEY, value TEXT NOT NULL, updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW())`);
+  await pool.query("INSERT INTO content(key,value) VALUES($1,$2) ON CONFLICT(key) DO NOTHING", ["story", DEFAULT_STORY]);
+  await pool.query("INSERT INTO content(key,value) VALUES($1,$2) ON CONFLICT(key) DO NOTHING", ["contact", DEFAULT_CONTACT]);
+  await pool.query("INSERT INTO content(key,value) VALUES($1,$2) ON CONFLICT(key) DO NOTHING", ["donations", DEFAULT_DONATIONS]);
 }
 
 async function getContent(key) {
@@ -96,59 +60,29 @@ async function getContent(key) {
 
 async function saveContent(key, value) {
   if (!pool) throw new Error("DATABASE_URL is not configured");
-  await pool.query(
-    "INSERT INTO content(key,value,updated_at) VALUES($1,$2,NOW()) ON CONFLICT(key) DO UPDATE SET value=EXCLUDED.value, updated_at=NOW()",
-    [key, value]
-  );
+  await pool.query("INSERT INTO content(key,value,updated_at) VALUES($1,$2,NOW()) ON CONFLICT(key) DO UPDATE SET value=EXCLUDED.value, updated_at=NOW()", [key, value]);
 }
 
 app.get("/health", async (req, res) => {
   let database = false;
-  if (pool) {
-    try { await pool.query("SELECT 1"); database = true; } catch (_) {}
-  }
-  res.status(200).json({
-    ok: true,
-    service: "Peace & Unity Admin",
-    configured: configured(),
-    database
-  });
+  if (pool) { try { await pool.query("SELECT 1"); database = true; } catch (_) {} }
+  res.status(200).json({ ok: true, service: "Peace & Unity Admin", configured: configured(), database });
 });
 
 app.get("/api/content", async (req, res) => {
   if (!pool) return res.status(503).json({ error: "Content storage is not configured." });
   try {
     const result = await pool.query("SELECT key,value,updated_at FROM content ORDER BY key");
-    const content = Object.fromEntries(result.rows.map(row => [row.key, row.value]));
-    res.json(content);
-  } catch (error) {
-    res.status(500).json({ error: "Unable to load content." });
-  }
+    res.json(Object.fromEntries(result.rows.map(row => [row.key, row.value])));
+  } catch (error) { res.status(500).json({ error: "Unable to load content." }); }
 });
 
-app.get("/", (req, res) => {
-  if (req.session.authenticated) return res.redirect("/dashboard");
-  return res.redirect("/login");
-});
+app.get("/", (req, res) => req.session.authenticated ? res.redirect("/dashboard") : res.redirect("/login"));
 
 app.get("/login", (req, res) => {
-  res.type("html").send(`<!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Peace & Unity — Admin Login</title>
-<style>
-body{margin:0;background:#f5f2e9;color:#17352d;font-family:Arial,sans-serif;min-height:100vh;display:grid;place-items:center;padding:20px}
-.card{width:min(420px,100%);background:#fffdf8;padding:34px;border-radius:20px;box-shadow:0 18px 50px #17352d18}
-h1{font:40px Georgia,serif;margin:0 0 8px}.muted{color:#69766e;line-height:1.6;font-size:14px}
-label{display:block;font-size:12px;font-weight:700;margin:20px 0 7px}input{width:100%;box-sizing:border-box;padding:13px;border:1px solid #dfe4d8;border-radius:9px;font-size:14px}
-button{width:100%;margin-top:22px;padding:14px;border:0;border-radius:999px;background:#27634e;color:#fff;font-weight:700;cursor:pointer}
-.note{margin-top:18px;font-size:11px;color:#69766e}
-</style></head><body><main class="card"><div style="font-size:28px">🌱</div><h1>Admin login</h1>
-<p class="muted">Private management area for Peace &amp; Unity.</p>
-${configured() ? `<form method="post" action="/login">
-<label for="email">Email</label><input id="email" name="email" type="email" autocomplete="username" required>
-<label for="password">Password</label><input id="password" name="password" type="password" autocomplete="current-password" required>
-<button type="submit">Sign in</button></form>` : `<p class="muted"><strong>Admin setup is not finished yet.</strong><br>Please configure the admin password in Render before signing in.</p>`}
-<p class="note">Your password is never stored in this website's public files.</p></main></body></html>`);
+  res.type("html").send(`<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Peace & Unity — Admin Login</title>
+<style>body{margin:0;background:#f5f2e9;color:#17352d;font-family:Arial,sans-serif;min-height:100vh;display:grid;place-items:center;padding:20px}.card{width:min(420px,100%);background:#fffdf8;padding:34px;border-radius:20px;box-shadow:0 18px 50px #17352d18}h1{font:40px Georgia,serif;margin:0 0 8px}.muted{color:#69766e;line-height:1.6;font-size:14px}label{display:block;font-size:12px;font-weight:700;margin:20px 0 7px}input{width:100%;box-sizing:border-box;padding:13px;border:1px solid #dfe4d8;border-radius:9px;font-size:14px}button{width:100%;margin-top:22px;padding:14px;border:0;border-radius:999px;background:#27634e;color:#fff;font-weight:700;cursor:pointer}.note{margin-top:18px;font-size:11px;color:#69766e}</style></head><body><main class="card"><div style="font-size:28px">🌱</div><h1>Admin login</h1><p class="muted">Private management area for Peace &amp; Unity.</p>
+${configured() ? `<form method="post" action="/login"><label for="email">Email</label><input id="email" name="email" type="email" autocomplete="username" required><label for="password">Password</label><input id="password" name="password" type="password" autocomplete="current-password" required><button type="submit">Sign in</button></form>` : `<p class="muted"><strong>Admin setup is not finished yet.</strong><br>Please configure the admin password in Render before signing in.</p>`}<p class="note">Your password is never stored in this website's public files.</p></main></body></html>`);
 });
 
 app.post("/login", async (req, res) => {
@@ -162,54 +96,26 @@ app.post("/login", async (req, res) => {
   res.redirect("/dashboard");
 });
 
-app.post("/logout", requireAuth, (req, res) => {
-  req.session.destroy(() => res.redirect("/login"));
-});
+app.post("/logout", requireAuth, (req, res) => req.session.destroy(() => res.redirect("/login")));
 
 app.get("/dashboard", requireAuth, async (req, res) => {
-  let story = "";
-  let storageReady = Boolean(pool);
-  if (pool) {
-    try { story = await getContent("story"); } catch (_) { storageReady = false; }
-  }
-
+  let story = "", storageReady = Boolean(pool);
+  if (pool) { try { story = await getContent("story"); } catch (_) { storageReady = false; } }
   const safeStory = String(story || "").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
-
-  res.type("html").send(`<!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Peace & Unity — Dashboard</title>
-<style>
-body{margin:0;background:#f5f2e9;color:#17352d;font-family:Arial,sans-serif}.wrap{max-width:1000px;margin:auto;padding:30px 22px}
-header{display:flex;justify-content:space-between;align-items:center;gap:20px}h1{font:46px Georgia,serif;margin:0}.muted{color:#69766e;line-height:1.6}
-.card{background:#fffdf8;border:1px solid #dfe4d8;border-radius:18px;padding:25px;margin-top:22px}.card h2{font:28px Georgia,serif;margin:0 0 8px}
-textarea{width:100%;box-sizing:border-box;min-height:360px;padding:16px;border:1px solid #dfe4d8;border-radius:12px;font:15px/1.7 Arial,sans-serif;resize:vertical}
-button{padding:11px 18px;border:0;border-radius:999px;background:#27634e;color:white;font-weight:700;cursor:pointer}.top{display:flex;justify-content:space-between;align-items:center;gap:15px}
-.notice{padding:12px 15px;border-radius:10px;background:#fff5d8;margin:15px 0}.success{background:#e8f5e9}
-@media(max-width:650px){h1{font-size:38px}.top{align-items:flex-start;flex-direction:column}}
-</style></head><body><div class="wrap">
-<div class="top"><div><div style="font-size:26px">🌱</div><h1>Admin Dashboard</h1><p class="muted">Private Peace &amp; Unity management area.</p></div>
-<form method="post" action="/logout"><button type="submit">Log out</button></form></div>
+  res.type("html").send(`<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Peace & Unity — Dashboard</title>
+<style>body{margin:0;background:#f5f2e9;color:#17352d;font-family:Arial,sans-serif}.wrap{max-width:1000px;margin:auto;padding:30px 22px}h1{font:46px Georgia,serif;margin:0}.muted{color:#69766e;line-height:1.6}.card{background:#fffdf8;border:1px solid #dfe4d8;border-radius:18px;padding:25px;margin-top:22px}.card h2{font:28px Georgia,serif;margin:0 0 8px}textarea{width:100%;box-sizing:border-box;min-height:360px;padding:16px;border:1px solid #dfe4d8;border-radius:12px;font:15px/1.7 Arial,sans-serif;resize:vertical}button{padding:11px 18px;border:0;border-radius:999px;background:#27634e;color:white;font-weight:700;cursor:pointer}.top{display:flex;justify-content:space-between;align-items:center;gap:15px}.notice{padding:12px 15px;border-radius:10px;background:#fff5d8;margin:15px 0}@media(max-width:650px){h1{font-size:38px}.top{align-items:flex-start;flex-direction:column}}</style></head><body><div class="wrap">
+<div class="top"><div><div style="font-size:26px">🌱</div><h1>Admin Dashboard</h1><p class="muted">Private Peace &amp; Unity management area.</p></div><form method="post" action="/logout"><button type="submit">Log out</button></form></div>
 ${storageReady ? "" : `<div class="notice">Content storage is not connected yet. The database must be linked to this Render service.</div>`}
-<div class="card"><h2>Stories</h2><p class="muted">Edit the main story shown on the Peace &amp; Unity website.</p>
-<form method="post" action="/admin/story"><textarea name="story" required>${safeStory}</textarea><br><button type="submit">Save story</button></form></div>
-<div class="card"><h2>Media</h2><p class="muted">Photo and video management is the next section we will add.</p></div>
-<div class="card"><h2>Contact</h2><p class="muted">Your public contact details will be editable here next.</p></div>
-<div class="card"><h2>Donations</h2><p class="muted">Your donation information will be editable here next.</p></div>
+<div class="card"><h2>Stories</h2><p class="muted">Edit the main story shown on the Peace &amp; Unity website.</p><form method="post" action="/admin/story"><textarea name="story" required>${safeStory}</textarea><br><button type="submit">Save story</button></form></div>
+<div class="card"><h2>Media</h2><p class="muted">Photo and video management is the next section we will add.</p></div><div class="card"><h2>Contact</h2><p class="muted">Your public contact details will be editable here next.</p></div><div class="card"><h2>Donations</h2><p class="muted">Your donation information will be editable here next.</p></div>
 </div></body></html>`);
 });
 
 app.post("/admin/story", requireAuth, async (req, res) => {
-  try {
-    await saveContent("story", String(req.body.story || "").trim());
-    res.redirect("/dashboard?saved=story");
-  } catch (error) {
-    res.status(503).send("Content storage is not connected yet. <a href="/dashboard">Back to dashboard</a>.");
-  }
+  try { await saveContent("story", String(req.body.story || "").trim()); res.redirect("/dashboard?saved=story"); }
+  catch (error) { res.status(503).send('Content storage is not connected yet. <a href="/dashboard">Back to dashboard</a>.'); }
 });
 
 initDatabase()
   .then(() => app.listen(PORT, "0.0.0.0", () => console.log(`Peace & Unity Admin listening on port ${PORT}`)))
-  .catch(error => {
-    console.error("Database initialization failed:", error.message);
-    app.listen(PORT, "0.0.0.0", () => console.log(`Peace & Unity Admin listening on port ${PORT}`));
-  });
+  .catch(error => { console.error("Database initialization failed:", error.message); app.listen(PORT, "0.0.0.0", () => console.log(`Peace & Unity Admin listening on port ${PORT}`)); });
