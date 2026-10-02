@@ -67,9 +67,21 @@
 .featured-visual-image img{
   display:block;
   width:100%;
-  height:auto;
-  max-height:430px;
-  object-fit:contain;
+  height:430px;
+  object-fit:cover;
+  object-position:center;
+}
+
+@media(max-width:800px){
+  .featured-visual-image img{
+    height:300px;
+  }
+}
+
+@media(max-width:480px){
+  .featured-visual-image img{
+    height:240px;
+  }
 }
 
 @media(max-width:800px){
