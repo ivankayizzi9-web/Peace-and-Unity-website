@@ -32,7 +32,56 @@
 @media(max-width:800px){.media-grid{grid-template-columns:1fr}}
 
 @media(max-width:800px){.wrap{padding:0 22px}.nav-links{gap:17px}.nav-links a:first-child,.nav-links a:nth-child(2){display:none}.hero{grid-template-columns:1fr;gap:45px;padding-top:35px}.photo-card{height:430px;margin-left:36px}.stat-pill{left:-29px}.hero-copy{max-width:540px}.section-head{align-items:start;gap:20px;flex-direction:column}.cards{grid-template-columns:1fr}.impact-card{min-height:unset}.story{grid-template-columns:1fr;gap:36px}.story-art{height:310px}.give-inner{grid-template-columns:1fr;gap:32px}.give{padding:65px 0}.give h2{font-size:46px}}@media(max-width:480px){.nav{height:70px}.brand{font-size:21px}.nav-cta{padding:12px 16px;font-size:12px}.nav-links{display:none}.hero{padding-bottom:56px}.hero h1{font-size:55px}.hero-copy{font-size:15px}.hero-actions{align-items:start;flex-direction:column}.trust{margin-top:30px}.photo-card{height:365px}.stat-pill{top:65px}.impact{padding:62px 0}.section-head h2{font-size:39px}.story{padding:65px 0}.story-copy h2{font-size:43px}.give h2{font-size:42px}.donate-box{padding:23px 19px}.amounts{gap:6px}.amount{font-size:13px}.footer-inner{flex-direction:column;gap:16px}.footer-links{gap:15px}}
-.contact{padding:78px 0;background:var(--paper)}.contact-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}.contact-card{border:1px solid var(--line);border-radius:18px;padding:28px;background:var(--cream)}.contact-card h3{font:26px var(--serif);margin:0 0 8px}.contact-card p{color:var(--muted);font-size:14px;line-height:1.6;margin:0 0 18px}.contact-link{display:inline-flex;align-items:center;gap:9px;font-weight:800;color:var(--green)}.contact-note{margin-top:25px;color:var(--muted);font-size:12px}@media(max-width:800px){.contact-grid{grid-template-columns:1fr}}\n</style>
+.contact{padding:78px 0;background:var(--paper)}.contact-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}.contact-card{border:1px solid var(--line);border-radius:18px;padding:28px;background:var(--cream)}.contact-card h3{font:26px var(--serif);margin:0 0 8px}.contact-card p{color:var(--muted);font-size:14px;line-height:1.6;margin:0 0 18px}.contact-link{display:inline-flex;align-items:center;gap:9px;font-weight:800;color:var(--green)}.contact-note{margin-top:25px;color:var(--muted);font-size:12px}@media(max-width:800px){.contact-grid{grid-template-columns:1fr}}\n.featured-visual{
+  display:grid;
+  grid-template-columns:1fr 1.35fr;
+  gap:28px;
+  align-items:center;
+  margin:0 0 28px;
+  padding:28px;
+  background:var(--paper);
+  border:1px solid var(--line);
+  border-radius:24px;
+  overflow:hidden;
+}
+
+.featured-visual-copy h3{
+  font:36px/1.05 var(--serif);
+  letter-spacing:-.04em;
+  margin:15px 0 14px;
+}
+
+.featured-visual-copy p{
+  color:var(--muted);
+  font-size:14px;
+  line-height:1.7;
+  margin:0;
+}
+
+.featured-visual-image{
+  border-radius:18px;
+  overflow:hidden;
+  background:#d8e2c0;
+}
+
+.featured-visual-image img{
+  display:block;
+  width:100%;
+  height:auto;
+  max-height:430px;
+  object-fit:cover;
+}
+
+@media(max-width:800px){
+  .featured-visual{
+    grid-template-columns:1fr;
+    padding:20px;
+  }
+
+  .featured-visual-copy h3{
+    font-size:31px;
+  }
+}</style>
 </head>
 <body>
 <header class="wrap nav"><a class="brand" href="#top" aria-label="Peace and Unity home"><span class="brand-mark"></span>peace &amp; unity</a><nav class="nav-links"><a href="#mission">Our mission</a><a href="#impact">Your impact</a><a href="#story">Stories</a><a href="#media">Media</a><a href="#contact">Contact</a></nav><a class="nav-cta" href="#give">Make a gift <span>↗</span></a></header>
