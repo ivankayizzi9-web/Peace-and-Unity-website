@@ -454,7 +454,7 @@ async function loadPeaceAndUnityContent(){
 
     if(data.donations){
       const donations=JSON.parse(data.donations);
-      const rows=[...document.querySelectorAll('.bank-row')];
+      const rows=[...document.querySelectorAll('.support-detail')];
       const values={
         airtelMoney:donations.airtelMoney,
         accountName:donations.accountName,
