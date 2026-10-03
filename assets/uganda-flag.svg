@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 400">
+<rect width="600" height="400" fill="#000"/>
+<rect y="66.666" width="600" height="66.666" fill="#f7d117"/>
+<rect y="133.333" width="600" height="66.666" fill="#d90000"/>
+<rect y="200" width="600" height="66.666" fill="#000"/>
+<rect y="266.666" width="600" height="66.666" fill="#f7d117"/>
+<rect y="333.333" width="600" height="66.667" fill="#d90000"/>
+<circle cx="300" cy="200" r="66" fill="#fff"/>
+<g transform="translate(300 200)" fill="#111">
+<ellipse cx="0" cy="5" rx="24" ry="39"/>
+<circle cx="0" cy="-31" r="12"/>
+<path d="M-5-41 L-17-60 L-10-63 L3-46 Z"/>
+<path d="M7-41 L18-58 L25-54 L14-38 Z"/>
+<path d="M-20 4 L-45 18 L-42 24 L-15 14 Z"/>
+<path d="M20 5 L47 18 L44 24 L15 14 Z"/>
+<path d="M-12 40 L-25 62 L-17 65 L-5 44 Z"/>
+<path d="M10 40 L24 61 L32 57 L18 36 Z"/>
+<path d="M-10-2 Q0 7 10-2 L7 7 Q0 13-7 7 Z" fill="#d90000"/>
+</g></svg>
