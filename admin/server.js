@@ -165,7 +165,7 @@ app.post("/api/enquiries", enquiryRateLimit, async (req, res) => {
 app.get("/api/content", async (req, res) => {
   if (!pool) return res.status(503).json({ error: "Content storage is not configured." });
   try {
-    const result = await pool.query("SELECT key,value,updated_at FROM content ORDER BY key");
+    const result = await pool.query("SELECT key,value,updated_at FROM content WHERE key = ANY($1) ORDER BY key", [["story","contact","donations","media"]]);
     res.json(Object.fromEntries(result.rows.map(row => [row.key, row.value])));
   } catch (error) { res.status(500).json({ error: "Unable to load content." }); }
 });
@@ -179,7 +179,7 @@ ${String(req.query.changed || "") === "1" ? `<div style="padding:12px 15px;borde
 ${(await configured()) ? `<form method="post" action="/login"><input type="hidden" name="_csrf" value="${req.session.csrfToken}"><label for="email">Email</label><input id="email" name="email" type="email" autocomplete="username" required><label for="password">Password</label><input id="password" name="password" type="password" autocomplete="current-password" required><button type="submit">Sign in</button></form>` : `<p class="muted"><strong>Admin setup is not finished yet.</strong><br>Please configure the admin password in Render before signing in.</p>`}<p class="note">Your password is never stored in this website's public files.</p></main></body></html>`);
 });
 
-app.post("/login", loginRateLimit, requireCsrf, async (req, res) => {
+app.post("/login", loginRateLimit, async (req, res) => {
   if (!(await configured())) return res.status(503).send("Admin setup is incomplete.");
   const email = String(req.body.email || "").trim().toLowerCase();
   const password = String(req.body.password || "");
@@ -293,6 +293,7 @@ app.post("/admin/media/add", requireAuth, requireSameOrigin, requireCsrf, async 
     const url = String(req.body.url || "").trim();
     if (!type || !title) return res.status(400).send('Media type and title are required. <a href="/dashboard">Back to dashboard</a>.');
     if (["image","video"].includes(type) && !url) return res.status(400).send('A public URL is required for images and videos. <a href="/dashboard">Back to dashboard</a>.');
+    if (url) { try { const parsedUrl = new URL(url); if (!["http:","https:"].includes(parsedUrl.protocol)) throw new Error(); } catch (_) { return res.status(400).send('Public URL must be a valid http(s) URL. <a href="/dashboard">Back to dashboard</a>.'); } }
     let items = [];
     try { items = JSON.parse(await getContent("media") || "[]"); } catch (_) {}
     items.push({ type, title, description, url, createdAt: new Date().toISOString() });
