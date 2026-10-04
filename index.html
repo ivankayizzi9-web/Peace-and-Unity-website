@@ -513,12 +513,12 @@ async function loadPeaceAndUnityContent(){
           if(!mediaItems.length){const empty=document.createElement("div");empty.className="media-empty";empty.textContent="Our first community pictures, videos, and stories will appear here soon.";grid.appendChild(empty);}
           mediaItems.forEach(item=>{
             const card=document.createElement("article"); card.className="media-card";
-            const type=["image","video","story"].includes(item.type)?item.type:"story";
+            const type=["image","video","story","project","news"].includes(item.type)?item.type:"story";
             const visual=document.createElement("div"); visual.className="media-visual "+(type==="video"?"video":type==="story"?"story-card":"");
-            const badge=document.createElement("span"); badge.className="media-type"; badge.textContent=type==="image"?"Picture":type==="video"?"Video":"Story"; visual.appendChild(badge);
+            const badge=document.createElement("span"); badge.className="media-type"; badge.textContent=type==="image"?"Picture":type==="video"?"Video":type==="project"?"Project":type==="news"?"News / Update":"Story"; visual.appendChild(badge);
             if(type==="image"){const img=document.createElement("img"); img.className="media-photo"; img.src=item.url; img.alt=item.title||"Peace & Unity community photo"; img.loading="lazy"; img.onerror=()=>{visual.innerHTML="";visual.appendChild(badge);const fallback=document.createElement("span");fallback.textContent="📷";visual.appendChild(fallback);}; visual.appendChild(img);}
             else if(type==="video"){const video=document.createElement("video"); video.className="media-video"; video.src=item.url; video.controls=true; video.preload="metadata"; visual.appendChild(video);}
-            else {const icon=document.createElement("span"); icon.textContent="🕊️"; visual.appendChild(icon);}
+            else {const icon=document.createElement("span"); icon.textContent=type==="project"?"🌱":type==="news"?"📰":"🕊️"; visual.appendChild(icon);}
             card.appendChild(visual);
             const body=document.createElement("div"); body.className="media-body"; const h3=document.createElement("h3"); h3.textContent=item.title||"Peace & Unity"; body.appendChild(h3);
             if(item.description){const p=document.createElement("p"); p.textContent=item.description; body.appendChild(p);}
