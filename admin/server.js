@@ -174,6 +174,27 @@ app.post("/login", loginRateLimit, async (req, res) => {
 
 app.post("/logout", requireAuth, requireCsrf, (req, res) => req.session.destroy(() => res.redirect("/login")));
 
+app.get("/admin/backup", requireAuth, async (req, res) => {
+  try {
+    const backup = {
+      exportedAt: new Date().toISOString(),
+      service: "Peace & Unity Admin",
+      content: {
+        story: await getContent("story"),
+        contact: JSON.parse(await getContent("contact")),
+        donations: JSON.parse(await getContent("donations")),
+        media: JSON.parse(await getContent("media") || "[]")
+      }
+    };
+    const filename = `peace-unity-backup-${new Date().toISOString().slice(0,10)}.json`;
+    res.setHeader("Content-Type", "application/json; charset=utf-8");
+    res.setHeader("Content-Disposition", `attachment; filename="${filename}"`);
+    res.send(JSON.stringify(backup, null, 2));
+  } catch (error) {
+    res.status(503).send('Unable to create backup. <a href="/dashboard">Back to dashboard</a>.');
+  }
+});
+
 app.post("/admin/change-password", requireAuth, requireCsrf, async (req, res) => {
   try {
     const currentPassword = String(req.body.currentPassword || "");
@@ -207,6 +228,7 @@ app.get("/dashboard", requireAuth, async (req, res) => {
 <style>body{margin:0;background:#f5f2e9;color:#17352d;font-family:Arial,sans-serif}.wrap{max-width:1000px;margin:auto;padding:30px 22px}h1{font:46px Georgia,serif;margin:0}.muted{color:#69766e;line-height:1.6}.card{background:#fffdf8;border:1px solid #dfe4d8;border-radius:18px;padding:25px;margin-top:22px}.card h2{font:28px Georgia,serif;margin:0 0 8px}input{width:100%;box-sizing:border-box;padding:12px;border:1px solid #dfe4d8;border-radius:9px;font-size:14px;margin:5px 0 10px}label{display:block;font-size:12px;font-weight:700;margin-top:10px}select{width:100%;box-sizing:border-box;padding:12px;border:1px solid #dfe4d8;border-radius:9px;font-size:14px;margin:5px 0 10px}textarea{width:100%;box-sizing:border-box;min-height:360px;padding:16px;border:1px solid #dfe4d8;border-radius:12px;font:15px/1.7 Arial,sans-serif;resize:vertical}button{padding:11px 18px;border:0;border-radius:999px;background:#27634e;color:white;font-weight:700;cursor:pointer}.danger{background:#9b3d3d}.media-item{display:flex;justify-content:space-between;gap:18px;align-items:flex-start;padding:16px 0;border-top:1px solid #e5e8df}.media-url{font-size:12px;word-break:break-all;margin:6px 0;color:#69766e}.tag{display:inline-block;margin-left:8px;padding:3px 8px;border-radius:999px;background:#e9efdf;font-size:11px;font-weight:700}.top{display:flex;justify-content:space-between;align-items:center;gap:15px}.notice{padding:12px 15px;border-radius:10px;background:#fff5d8;margin:15px 0}@media(max-width:650px){h1{font-size:38px}.top{align-items:flex-start;flex-direction:column}}</style></head><body><div class="wrap">
 <div class="top"><div><div style="font-size:26px">🌱</div><h1>Admin Dashboard</h1><p class="muted">Private Peace &amp; Unity management area.</p></div><form method="post" action="/logout"><input type="hidden" name="_csrf" value="${req.session.csrfToken}"><button type="submit">Log out</button></form></div>
 ${storageReady ? (saved ? `<div class="notice" style="background:#e7f4e8">Saved successfully. Your ${esc(saved)} content has been updated.</div>` : "") : `<div class="notice">Content storage is not connected yet. The database must be linked to this Render service.</div>`}
+<div class="card"><h2>Admin Backup</h2><p class="muted">Download a safe copy of your website content. Passwords and security secrets are never included.</p><a href="/admin/backup" style="display:inline-block;padding:11px 18px;border-radius:999px;background:#27634e;color:#fff;font-weight:700;text-decoration:none">Download Backup</a></div>
 <div class="card"><h2>Change password</h2><p class="muted">Change the admin password without opening Render Environment settings. Use a strong password with at least 12 characters.</p><form method="post" action="/admin/change-password"><input type="hidden" name="_csrf" value="${req.session.csrfToken}"><label>Current password</label><input name="currentPassword" type="password" autocomplete="current-password" required><label>New password</label><input name="newPassword" type="password" autocomplete="new-password" minlength="12" required><label>Confirm new password</label><input name="confirmPassword" type="password" autocomplete="new-password" minlength="12" required><br><button type="submit">Change password</button></form></div>
 <div class="card"><h2>Stories</h2><p class="muted">Edit the main story shown on the Peace &amp; Unity website.</p><form method="post" action="/admin/story"><input type="hidden" name="_csrf" value="${req.session.csrfToken}"><textarea name="story" required>${safeStory}</textarea><br><button type="submit">Save story</button></form></div>
 <div class="card"><h2>Contact</h2><p class="muted">Update the public email address and WhatsApp number.</p><form method="post" action="/admin/contact"><input type="hidden" name="_csrf" value="${req.session.csrfToken}"><label>Email</label><input name="email" type="email" value="${JSON.parse(contact).email || ""}" required><label>WhatsApp</label><input name="whatsapp" value="${JSON.parse(contact).whatsapp || ""}" required><br><button type="submit">Save contact</button></form></div>
