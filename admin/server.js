@@ -204,7 +204,7 @@ app.post("/login", loginRateLimit, async (req, res) => {
   });
 });
 
-app.post("/logout", requireAuth, requireSameOrigin, requireCsrf, (req, res) => req.session.destroy(() => res.redirect("/login")));
+app.post("/logout", requireAuth, requireCsrf, (req, res) => req.session.destroy(() => res.redirect("/login")));
 
 app.get("/admin/backup", requireAuth, async (req, res) => {
   try {
@@ -227,7 +227,7 @@ app.get("/admin/backup", requireAuth, async (req, res) => {
   }
 });
 
-app.post("/admin/change-password", requireAuth, requireSameOrigin, requireCsrf, async (req, res) => {
+app.post("/admin/change-password", requireAuth, requireCsrf, async (req, res) => {
   try {
     const currentPassword = String(req.body.currentPassword || "");
     const newPassword = String(req.body.newPassword || "");
@@ -275,17 +275,17 @@ ${storageReady ? (saved ? `<div class="notice" style="background:#e7f4e8">Saved 
 </div></body></html>`);
 });
 
-app.post("/admin/story", requireAuth, requireSameOrigin, requireCsrf, async (req, res) => {
+app.post("/admin/story", requireAuth, requireCsrf, async (req, res) => {
   try { await saveContent("story", String(req.body.story || "").trim()); res.redirect("/dashboard?saved=story"); }
   catch (error) { res.status(503).send('Content storage is not connected yet. <a href="/dashboard">Back to dashboard</a>.'); }
 });
 
-app.post("/admin/contact", requireAuth, requireSameOrigin, requireCsrf, async (req, res) => {
+app.post("/admin/contact", requireAuth, requireCsrf, async (req, res) => {
   try { await saveContent("contact", JSON.stringify({ email: String(req.body.email || "").trim(), whatsapp: String(req.body.whatsapp || "").trim() })); res.redirect("/dashboard?saved=contact"); }
   catch (error) { res.status(503).send('Content storage is not connected yet. <a href="/dashboard">Back to dashboard</a>.'); }
 });
 
-app.post("/admin/media/add", requireAuth, requireSameOrigin, requireCsrf, async (req, res) => {
+app.post("/admin/media/add", requireAuth, requireCsrf, async (req, res) => {
   try {
     const type = ["image","video","story","project","news"].includes(String(req.body.type || "")) ? String(req.body.type) : "";
     const title = String(req.body.title || "").trim();
@@ -302,7 +302,7 @@ app.post("/admin/media/add", requireAuth, requireSameOrigin, requireCsrf, async 
   } catch (error) { res.status(503).send('Unable to save media. <a href="/dashboard">Back to dashboard</a>.'); }
 });
 
-app.post("/admin/media/delete", requireAuth, requireSameOrigin, requireCsrf, async (req, res) => {
+app.post("/admin/media/delete", requireAuth, requireCsrf, async (req, res) => {
   try {
     const index = Number(req.body.index);
     let items = [];
@@ -314,7 +314,7 @@ app.post("/admin/media/delete", requireAuth, requireSameOrigin, requireCsrf, asy
   } catch (error) { res.status(503).send('Unable to delete media. <a href="/dashboard">Back to dashboard</a>.'); }
 });
 
-app.post("/admin/enquiries/delete", requireAuth, requireSameOrigin, requireCsrf, async (req, res) => {
+app.post("/admin/enquiries/delete", requireAuth, requireCsrf, async (req, res) => {
   try {
     const index = Number(req.body.index);
     let items = [];
@@ -326,7 +326,7 @@ app.post("/admin/enquiries/delete", requireAuth, requireSameOrigin, requireCsrf,
   } catch (error) { res.status(503).send('Unable to delete enquiry. <a href="/dashboard">Back to dashboard</a>.'); }
 });
 
-app.post("/admin/donations", requireAuth, requireSameOrigin, requireCsrf, async (req, res) => {
+app.post("/admin/donations", requireAuth, requireCsrf, async (req, res) => {
   try {
     const airtelMoney = String(req.body.airtelMoney || "").trim();
     const mtnMoney = String(req.body.mtnMoney || "").trim();
