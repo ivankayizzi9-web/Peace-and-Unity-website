@@ -292,7 +292,7 @@ app.post("/admin/media/add", requireAuth, requireCsrf, async (req, res) => {
     const description = String(req.body.description || "").trim();
     const url = String(req.body.url || "").trim();
     if (!type || !title) return res.status(400).send('Media type and title are required. <a href="/dashboard">Back to dashboard</a>.');
-    if (type !== "story" && !url) return res.status(400).send('A public URL is required for images and videos. <a href="/dashboard">Back to dashboard</a>.');
+    if (["image","video"].includes(type) && !url) return res.status(400).send('A public URL is required for images and videos. <a href="/dashboard">Back to dashboard</a>.');
     let items = [];
     try { items = JSON.parse(await getContent("media") || "[]"); } catch (_) {}
     items.push({ type, title, description, url, createdAt: new Date().toISOString() });
