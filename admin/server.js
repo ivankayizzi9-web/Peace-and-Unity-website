@@ -36,7 +36,7 @@ app.set("trust proxy", 1);
 app.use(helmet());
 app.use((req, res, next) => {
   res.setHeader("Access-Control-Allow-Origin", "https://peace-and-unity-website.onrender.com");
-  res.setHeader("Access-Control-Allow-Methods", "GET, OPTIONS");
+  res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type");
   next();
 });
@@ -73,6 +73,17 @@ function requireSameOrigin(req, res, next) {
 }
 
 const loginAttempts = new Map();
+const enquiryAttempts = new Map();
+function enquiryRateLimit(req, res, next) {
+  const now = Date.now();
+  const key = req.ip || "unknown";
+  const entry = enquiryAttempts.get(key) || { count: 0, resetAt: now + 15 * 60 * 1000 };
+  if (now > entry.resetAt) { entry.count = 0; entry.resetAt = now + 15 * 60 * 1000; }
+  if (entry.count >= 5) return res.status(429).json({ error: "Too many messages. Please try again later." });
+  entry.count += 1;
+  enquiryAttempts.set(key, entry);
+  next();
+}
 function loginRateLimit(req, res, next) {
   const now = Date.now();
   const key = req.ip || "unknown";
@@ -95,6 +106,7 @@ async function initDatabase() {
   await pool.query("INSERT INTO content(key,value) VALUES($1,$2) ON CONFLICT(key) DO NOTHING", ["contact", DEFAULT_CONTACT]);
   await pool.query("INSERT INTO content(key,value) VALUES($1,$2) ON CONFLICT(key) DO NOTHING", ["donations", DEFAULT_DONATIONS]);
   await pool.query("INSERT INTO content(key,value) VALUES($1,$2) ON CONFLICT(key) DO NOTHING", ["media", "[]"]);
+  await pool.query("INSERT INTO content(key,value) VALUES($1,$2) ON CONFLICT(key) DO NOTHING", ["enquiries", "[]"]);
 }
 
 async function getStoredPasswordHash() {
@@ -128,6 +140,25 @@ app.get("/health", async (req, res) => {
   let database = false;
   if (pool) { try { await pool.query("SELECT 1"); database = true; } catch (_) {} }
   res.status(200).json({ ok: true, service: "Peace & Unity Admin", configured: await configured(), database, passwordHashConfigured: Boolean(ADMIN_PASSWORD_HASH || (await getStoredPasswordHash().catch(() => ""))), sessionStore: pool ? "postgres" : "memory" });
+});
+
+app.post("/api/enquiries", enquiryRateLimit, async (req, res) => {
+  try {
+    if (!pool) return res.status(503).json({ error: "Message storage is not configured." });
+    if (String(req.body.website || "").trim()) return res.status(400).json({ error: "Unable to send message." });
+    const name = String(req.body.name || "").trim().slice(0, 100);
+    const email = String(req.body.email || "").trim().slice(0, 160);
+    const message = String(req.body.message || "").trim().slice(0, 2000);
+    if (!name || !email || !message) return res.status(400).json({ error: "Name, email and message are required." });
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return res.status(400).json({ error: "Please enter a valid email address." });
+    let items = [];
+    try { items = JSON.parse(await getContent("enquiries") || "[]"); } catch (_) {}
+    items.unshift({ id: crypto.randomUUID(), name, email, message, createdAt: new Date().toISOString(), status: "new" });
+    await saveContent("enquiries", JSON.stringify(items.slice(0, 200)));
+    res.status(201).json({ ok: true });
+  } catch (error) {
+    res.status(503).json({ error: "Unable to save your message right now." });
+  }
 });
 
 app.get("/api/content", async (req, res) => {
@@ -218,21 +249,23 @@ app.post("/admin/change-password", requireAuth, requireCsrf, async (req, res) =>
 });
 
 app.get("/dashboard", requireAuth, async (req, res) => {
-  let story = "", contact = DEFAULT_CONTACT, donations = DEFAULT_DONATIONS, media = "[]", storageReady = Boolean(pool), saved = String(req.query.saved || "");
-  if (pool) { try { story = await getContent("story"); contact = await getContent("contact"); donations = await getContent("donations"); media = await getContent("media"); } catch (_) { storageReady = false; } }
+  let story = "", contact = DEFAULT_CONTACT, donations = DEFAULT_DONATIONS, media = "[]", enquiries = "[]", storageReady = Boolean(pool), saved = String(req.query.saved || "");
+  if (pool) { try { story = await getContent("story"); contact = await getContent("contact"); donations = await getContent("donations"); media = await getContent("media"); enquiries = await getContent("enquiries"); } catch (_) { storageReady = false; } }
   const safeStory = String(story || "").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
   let mediaItems = []; try { mediaItems = JSON.parse(media || "[]"); } catch (_) { mediaItems = []; }
+  let enquiryItems = []; try { enquiryItems = JSON.parse(enquiries || "[]"); } catch (_) { enquiryItems = []; }
   let donationData = {}; try { donationData = JSON.parse(donations || "{}"); } catch (_) { donationData = {}; }
   const donationMethods = [donationData.airtelMoney, donationData.mtnMoney, donationData.bank, donationData.accountNumber].filter(Boolean).length > 0 ? [donationData.airtelMoney, donationData.mtnMoney, donationData.bank && donationData.accountNumber ? "bank" : ""].filter(Boolean).length : 0;
   let lastUpdated = null;
   if (pool) { try { const updated = await pool.query("SELECT MAX(updated_at) AS last_updated FROM content"); lastUpdated = updated.rows[0]?.last_updated || null; } catch (_) {} }
   const esc = value => String(value ?? "").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+  const enquiryRows = enquiryItems.length ? enquiryItems.map((item,index) => `<div class="media-item"><div><strong>${esc(item.name)}</strong><span class="tag">${esc(item.status || "new")}</span><div class="media-url">${esc(item.email)} · ${esc(item.createdAt ? new Date(item.createdAt).toLocaleString() : "")}</div><div class="muted">${esc(item.message)}</div></div><form method="post" action="/admin/enquiries/delete"><input type="hidden" name="_csrf" value="${req.session.csrfToken}"><input type="hidden" name="index" value="${index}"><button class="danger" type="submit">Delete</button></form></div>`).join("") : `<p class="muted">No enquiries yet.</p>`;
   const mediaRows = mediaItems.length ? mediaItems.map((item,index) => `<div class="media-item"><div><strong>${esc(item.title)}</strong><span class="tag">${esc(item.type)}</span><div class="media-url">${esc(item.url)}</div><div class="muted">${esc(item.description)}</div></div><form method="post" action="/admin/media/delete"><input type="hidden" name="_csrf" value="${req.session.csrfToken}"><input type="hidden" name="index" value="${index}"><button class="danger" type="submit">Delete</button></form></div>`).join("") : `<p class="muted">No media has been added yet.</p>`;
   res.type("html").send(`<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Peace & Unity — Dashboard</title>
 <style>body{margin:0;background:#f5f2e9;color:#17352d;font-family:Arial,sans-serif}.wrap{max-width:1000px;margin:auto;padding:30px 22px}h1{font:46px Georgia,serif;margin:0}.muted{color:#69766e;line-height:1.6}.card{background:#fffdf8;border:1px solid #dfe4d8;border-radius:18px;padding:25px;margin-top:22px}.card h2{font:28px Georgia,serif;margin:0 0 8px}input{width:100%;box-sizing:border-box;padding:12px;border:1px solid #dfe4d8;border-radius:9px;font-size:14px;margin:5px 0 10px}label{display:block;font-size:12px;font-weight:700;margin-top:10px}select{width:100%;box-sizing:border-box;padding:12px;border:1px solid #dfe4d8;border-radius:9px;font-size:14px;margin:5px 0 10px}textarea{width:100%;box-sizing:border-box;min-height:360px;padding:16px;border:1px solid #dfe4d8;border-radius:12px;font:15px/1.7 Arial,sans-serif;resize:vertical}button{padding:11px 18px;border:0;border-radius:999px;background:#27634e;color:white;font-weight:700;cursor:pointer}.danger{background:#9b3d3d}.media-item{display:flex;justify-content:space-between;gap:18px;align-items:flex-start;padding:16px 0;border-top:1px solid #e5e8df}.media-url{font-size:12px;word-break:break-all;margin:6px 0;color:#69766e}.tag{display:inline-block;margin-left:8px;padding:3px 8px;border-radius:999px;background:#e9efdf;font-size:11px;font-weight:700}.top{display:flex;justify-content:space-between;align-items:center;gap:15px}.notice{padding:12px 15px;border-radius:10px;background:#fff5d8;margin:15px 0}.overview{background:#17352d;color:#fff;border-radius:18px;padding:22px;margin-top:22px}.overview h2{font:28px Georgia,serif;margin:0 0 5px}.overview .muted{color:#c8d5ce}.overview-title{display:flex;justify-content:space-between;align-items:flex-start;gap:18px}.last-updated{font-size:12px;color:#c8d5ce;text-align:right}.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:18px}.stat{background:#fff;color:#17352d;border-radius:14px;padding:16px}.stat strong{display:block;font:30px Georgia,serif;margin-bottom:4px}.stat span{font-size:12px;color:#69766e}@media(max-width:650px){h1{font-size:38px}.top{align-items:flex-start;flex-direction:column}.overview-title{flex-direction:column}.last-updated{text-align:left}.stats{grid-template-columns:repeat(2,1fr)}}</style></head><body><div class="wrap">
 <div class="top"><div><div style="font-size:26px">🌱</div><h1>Admin Dashboard</h1><p class="muted">Private Peace &amp; Unity management area.</p></div><form method="post" action="/logout"><input type="hidden" name="_csrf" value="${req.session.csrfToken}"><button type="submit">Log out</button></form></div>
 ${storageReady ? (saved ? `<div class="notice" style="background:#e7f4e8">Saved successfully. Your ${esc(saved)} content has been updated.</div>` : "") : `<div class="notice">Content storage is not connected yet. The database must be linked to this Render service.</div>`}
-<div class="overview"><div class="overview-title"><div><h2>Overview</h2><p class="muted">Quick view of your Peace &amp; Unity content.</p></div><div class="last-updated">${lastUpdated ? `Last content update: ${esc(new Date(lastUpdated).toLocaleString())}` : "Last content update: —"}</div></div><div class="stats"><div class="stat"><strong>${story.trim() ? "1" : "0"}</strong><span>Story</span></div><div class="stat"><strong>${mediaItems.length}</strong><span>Media items</span></div><div class="stat"><strong>${donationMethods}</strong><span>Donation methods</span></div><div class="stat"><strong>${contact.trim() ? "✓" : "—"}</strong><span>Contact details</span></div></div></div>
+<div class="overview"><div class="overview-title"><div><h2>Overview</h2><p class="muted">Quick view of your Peace &amp; Unity content.</p></div><div class="last-updated">${lastUpdated ? `Last content update: ${esc(new Date(lastUpdated).toLocaleString())}` : "Last content update: —"}</div></div><div class="stats"><div class="stat"><strong>${story.trim() ? "1" : "0"}</strong><span>Story</span></div><div class="stat"><strong>${mediaItems.length}</strong><span>Media items</span></div><div class="stat"><strong>${donationMethods}</strong><span>Donation methods</span></div><div class="stat"><strong>${contact.trim() ? "✓" : "—"}</strong><span>Contact details</span></div><div class="stat"><strong>${enquiryItems.length}</strong><span>Enquiries</span></div></div></div>
 <div class="card"><h2>Admin Backup</h2><p class="muted">Download a safe copy of your website content. Passwords and security secrets are never included.</p><a href="/admin/backup" style="display:inline-block;padding:11px 18px;border-radius:999px;background:#27634e;color:#fff;font-weight:700;text-decoration:none">Download Backup</a></div>
 <div class="card"><h2>Change password</h2><p class="muted">Change the admin password without opening Render Environment settings. Use a strong password with at least 12 characters.</p><form method="post" action="/admin/change-password"><input type="hidden" name="_csrf" value="${req.session.csrfToken}"><label>Current password</label><input name="currentPassword" type="password" autocomplete="current-password" required><label>New password</label><input name="newPassword" type="password" autocomplete="new-password" minlength="12" required><label>Confirm new password</label><input name="confirmPassword" type="password" autocomplete="new-password" minlength="12" required><br><button type="submit">Change password</button></form></div>
 <div class="card"><h2>Stories</h2><p class="muted">Edit the main story shown on the Peace &amp; Unity website.</p><form method="post" action="/admin/story"><input type="hidden" name="_csrf" value="${req.session.csrfToken}"><textarea name="story" required>${safeStory}</textarea><br><button type="submit">Save story</button></form></div>
@@ -277,6 +310,18 @@ app.post("/admin/media/delete", requireAuth, requireCsrf, async (req, res) => {
     await saveContent("media", JSON.stringify(items));
     res.redirect("/dashboard?saved=media");
   } catch (error) { res.status(503).send('Unable to delete media. <a href="/dashboard">Back to dashboard</a>.'); }
+});
+
+app.post("/admin/enquiries/delete", requireAuth, requireCsrf, async (req, res) => {
+  try {
+    const index = Number(req.body.index);
+    let items = [];
+    try { items = JSON.parse(await getContent("enquiries") || "[]"); } catch (_) {}
+    if (!Number.isInteger(index) || index < 0 || index >= items.length) return res.status(400).send('Invalid enquiry. <a href="/dashboard">Back to dashboard</a>.');
+    items.splice(index, 1);
+    await saveContent("enquiries", JSON.stringify(items));
+    res.redirect("/dashboard?saved=enquiry");
+  } catch (error) { res.status(503).send('Unable to delete enquiry. <a href="/dashboard">Back to dashboard</a>.'); }
 });
 
 app.post("/admin/donations", requireAuth, requireCsrf, async (req, res) => {
