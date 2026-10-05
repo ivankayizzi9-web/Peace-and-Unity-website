@@ -197,8 +197,41 @@
   html,body{
     width:100%;
     max-width:100%;
+    margin:0;
+    padding:0;
     overflow-x:hidden;
   }
+
+  *,*::before,*::after{
+    box-sizing:border-box;
+    max-width:100%;
+  }
+
+  img,video,iframe{
+    max-width:100%;
+    height:auto;
+  }
+
+  .container{
+    width:100%;
+    max-width:100%;
+    padding-left:18px;
+    padding-right:18px;
+  }
+
+  .contact-form{
+    width:100%;
+    max-width:100%;
+    grid-template-columns:1fr;
+    overflow:hidden;
+  }
+
+  .contact-form input,
+  .contact-form textarea,
+  .contact-form button{
+    max-width:100%;
+  }
+}
 
   *{
     max-width:100%;
