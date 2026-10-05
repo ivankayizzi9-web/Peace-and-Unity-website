@@ -4,6 +4,159 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+  :root{
+    --ink:#18352b;
+    --muted:#66756e;
+    --cream:#f7f4ec;
+    --paper:#fffdf8;
+    --line:#dfe5df;
+    --accent:#b98b4a;
+  }
+
+  *{box-sizing:border-box}
+
+  body{
+    margin:0;
+    background:var(--cream);
+    color:var(--ink);
+    font-family:Arial,sans-serif;
+    line-height:1.75;
+  }
+
+  .wrap{
+    width:min(1120px,calc(100% - 40px));
+    margin:0 auto;
+  }
+
+  .site-header{
+    background:var(--paper);
+    border-bottom:1px solid var(--line);
+    padding:20px 0;
+  }
+
+  .site-header .wrap{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:25px;
+  }
+
+  .brand{
+    color:var(--ink);
+    text-decoration:none;
+    font-weight:700;
+    font-size:22px;
+  }
+
+  nav{
+    display:flex;
+    gap:20px;
+    flex-wrap:wrap;
+  }
+
+  nav a{
+    color:var(--ink);
+    text-decoration:none;
+    font-size:14px;
+  }
+
+  nav a:hover{
+    text-decoration:underline;
+  }
+
+  .story-page{
+    max-width:850px;
+    padding:80px 0;
+  }
+
+  .eyebrow{
+    color:var(--accent);
+    font-size:13px;
+    font-weight:700;
+    letter-spacing:.12em;
+    text-transform:uppercase;
+    margin-bottom:12px;
+  }
+
+  h1{
+    margin:0 0 12px;
+    font-family:Georgia,serif;
+    font-size:clamp(42px,7vw,72px);
+    line-height:1.05;
+    color:var(--ink);
+  }
+
+  h2{
+    font-family:Georgia,serif;
+    line-height:1.2;
+  }
+
+  .story-page > p{
+    max-width:780px;
+    font-size:17px;
+    color:#45554e;
+    margin:0 0 22px;
+  }
+
+  .story-page > p:first-of-type{
+    margin-top:8px;
+  }
+
+  .story-closing{
+    margin:45px 0 35px;
+    padding:28px;
+    background:var(--paper);
+    border:1px solid var(--line);
+    border-radius:18px;
+  }
+
+  .story-closing h2{
+    margin:0;
+    font-size:28px;
+  }
+
+  .button{
+    display:inline-block;
+    padding:13px 20px;
+    border-radius:999px;
+    background:var(--ink);
+    color:white;
+    text-decoration:none;
+    font-weight:700;
+  }
+
+  footer{
+    border-top:1px solid var(--line);
+    padding:30px 0;
+    background:var(--paper);
+  }
+
+  footer p{
+    margin:0;
+    color:var(--muted);
+    font-size:13px;
+  }
+
+  @media(max-width:700px){
+    .site-header .wrap{
+      align-items:flex-start;
+      flex-direction:column;
+    }
+
+    nav{
+      gap:12px;
+    }
+
+    .story-page{
+      padding:55px 0;
+    }
+
+    .story-page > p{
+      font-size:16px;
+    }
+  }
+</style>
   <title>Our Story — Peace &amp; Unity</title>
   <meta name="description" content="The story behind Peace &amp; Unity — Tears Behind Our Smiles, by Ivan Kayizzi.">
   
