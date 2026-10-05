@@ -273,6 +273,44 @@
     max-width:100%;
   }
 }
+  
+  @media(max-width:700px){
+  .story{
+    width:100%;
+    max-width:100%;
+    margin-left:0;
+    margin-right:0;
+    padding-left:18px;
+    padding-right:18px;
+    box-sizing:border-box;
+    display:block;
+    overflow:hidden;
+  }
+
+  .story-art,
+  .story-copy{
+    width:100%;
+    max-width:100%;
+    min-width:0;
+    box-sizing:border-box;
+  }
+
+  .story-art{
+    margin-bottom:28px;
+  }
+
+  .story-copy{
+    overflow-wrap:anywhere;
+    word-break:normal;
+  }
+
+  .story-copy h2,
+  .story-copy p{
+    max-width:100%;
+    box-sizing:border-box;
+    overflow-wrap:anywhere;
+  }
+}
 
 </style>
 </head>
