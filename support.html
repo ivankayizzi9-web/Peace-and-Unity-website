@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Where Your Support Goes | Peace &amp; Unity</title>
+
+  <style>
+    :root{
+      --green:#18352b;
+      --gold:#b98b4a;
+      --cream:#f7f3ec;
+      --white:#ffffff;
+      --text:#26332e;
+      --muted:#68736e;
+      --line:#ded8ce;
+      --serif:Georgia,"Times New Roman",serif;
+    }
+
+    *{
+      box-sizing:border-box;
+    }
+
+    body{
+      margin:0;
+      background:var(--cream);
+      color:var(--text);
+      font-family:Arial,Helvetica,sans-serif;
+      line-height:1.7;
+    }
+
+    .wrap{
+      width:min(1100px,92%);
+      margin:auto;
+    }
+
+    header{
+      background:var(--green);
+      color:white;
+      padding:20px 0;
+    }
+
+    .header-inner{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:20px;
+    }
+
+    .brand{
+      color:white;
+      text-decoration:none;
+      font-family:var(--serif);
+      font-size:24px;
+      font-weight:bold;
+    }
+
+    nav{
+      display:flex;
+      flex-wrap:wrap;
+      gap:16px;
+      align-items:center;
+    }
+
+    nav a{
+      color:white;
+      text-decoration:none;
+      font-size:14px;
+      font-weight:bold;
+    }
+
+    nav a:hover{
+      color:#e1c28f;
+    }
+
+    .hero{
+      padding:80px 0 55px;
+      text-align:center;
+    }
+
+    .eyebrow{
+      color:var(--gold);
+      text-transform:uppercase;
+      letter-spacing:2px;
+      font-size:12px;
+      font-weight:bold;
+      margin-bottom:12px;
+    }
+
+    h1{
+      margin:0 auto 18px;
+      max-width:800px;
+      color:var(--green);
+      font-family:var(--serif);
+      font-size:clamp(40px,6vw,64px);
+      line-height:1.08;
+    }
+
+    .hero p{
+      max-width:720px;
+      margin:auto;
+      color:var(--muted);
+      font-size:17px;
+    }
+
+    .support-grid{
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      gap:22px;
+      padding-bottom:70px;
+    }
+
+    .support-card{
+      background:var(--white);
+      border:1px solid var(--line);
+      border-radius:20px;
+      padding:30px;
+      box-shadow:0 8px 25px rgba(24,53,43,.05);
+    }
+
+    .support-icon{
+      font-size:38px;
+      margin-bottom:16px;
+    }
+
+    .support-card h2{
+      color:var(--green);
+      font-family:var(--serif);
+      font-size:25px;
+      margin:0 0 10px;
+    }
+
+    .support-card p{
+      color:var(--muted);
+      margin:0;
+      font-size:15px;
+    }
+
+    .commitment{
+      background:var(--green);
+      color:white;
+      border-radius:24px;
+      padding:45px;
+      margin-bottom:55px;
+    }
+
+    .commitment h2{
+      font-family:var(--serif);
+      font-size:32px;
+      margin:0 0 12px;
+    }
+
+    .commitment p{
+      margin:0;
+      color:#e6ebe7;
+      max-width:800px;
+    }
+
+    .actions{
+      text-align:center;
+      padding-bottom:70px;
+    }
+
+    .button{
+      display:inline-block;
+      background:var(--gold);
+      color:white;
+      text-decoration:none;
+      padding:13px 22px;
+      border-radius:999px;
+      font-weight:bold;
+      margin:6px;
+    }
+
+    .button:hover{
+      background:var(--green);
+    }
+
+    footer{
+      background:var(--green);
+      color:#dce4df;
+      text-align:center;
+      padding:28px 0;
+      font-size:13px;
+    }
+
+    @media(max-width:800px){
+      .header-inner{
+        flex-direction:column;
+      }
+
+      nav{
+        justify-content:center;
+      }
+
+      .support-grid{
+        grid-template-columns:1fr;
+      }
+
+      .hero{
+        padding:60px 0 40px;
+      }
+
+      .commitment{
+        padding:30px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<header>
+  <div class="wrap header-inner">
+    <a class="brand" href="index.html">Peace &amp; Unity</a>
+
+    <nav>
+      <a href="index.html">Home</a>
+      <a href="story.html">Our Story</a>
+      <a href="help.html">How You Can Help</a>
+      <a href="impact.html">Our Impact</a>
+      <a href="contact.html">Contact</a>
+      <a href="give.html">Make a Gift</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+
+  <section class="hero">
+    <div class="wrap">
+      <div class="eyebrow">Your support in action</div>
+
+      <h1>Where Your Support Goes</h1>
+
+      <p>
+        Every contribution can help Peace &amp; Unity respond to practical needs
+        and stand alongside people and families who are struggling.
+      </p>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap support-grid">
+
+      <article class="support-card">
+        <div class="support-icon">🍲</div>
+        <h2>Food &amp; Basic Needs</h2>
+        <p>
+          Support can help provide essential items to people and families
+          facing difficult circumstances, including food and other everyday
+          necessities.
+        </p>
+      </article>
+
+      <article class="support-card">
+        <div class="support-icon">📚</div>
+        <h2>Children &amp; Education</h2>
+        <p>
+          Help can go toward children whose families are struggling with
+          school fees and other needs that can make education difficult
+          to continue.
+        </p>
+      </article>
+
+      <article class="support-card">
+        <div class="support-icon">🏠</div>
+        <h2>Vulnerable Families</h2>
+        <p>
+          Support can help families facing hardship with practical assistance
+          and a connection to people who are willing and able to help.
+        </p>
+      </article>
+
+      <article class="support-card">
+        <div class="support-icon">❤️</div>
+        <h2>Emergency Support</h2>
+        <p>
+          When urgent needs arise, contributions can help Peace &amp; Unity
+          respond with compassion and practical support where possible.
+        </p>
+      </article>
+
+      <article class="support-card">
+        <div class="support-icon">🤝</div>
+        <h2>Community Support</h2>
+        <p>
+          We want to bring people together around local needs and encourage
+          collective action that strengthens communities.
+        </p>
+      </article>
+
+      <article class="support-card">
+        <div class="support-icon">🌱</div>
+        <h2>Hope &amp; Opportunity</h2>
+        <p>
+          Our long-term aim is to create pathways to support, opportunity,
+          and hope for people who may otherwise feel forgotten.
+        </p>
+      </article>
+
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap">
+      <div class="commitment">
+        <div class="eyebrow">Our commitment</div>
+        <h2>Turning compassion into practical support.</h2>
+        <p>
+          Peace &amp; Unity will continue building practical ways to connect
+          support with real needs. As the initiative grows, we will share
+          more updates about the people, families, and community projects
+          being supported.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section class="actions">
+    <div class="wrap">
+      <a class="button" href="index.html">← Back to Peace &amp; Unity</a>
+      <a class="button" href="give.html">Make a Gift</a>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    Peace &amp; Unity — Together We Can Make a Difference.
+  </div>
+</footer>
+
+</body>
+</html>
