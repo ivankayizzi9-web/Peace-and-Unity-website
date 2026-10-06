@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Our Values — Peace &amp; Unity</title>
+
+  <style>
+    :root{
+      --ink:#17352d;
+      --green:#27634e;
+      --lime:#d6ea87;
+      --cream:#f5f2e9;
+      --paper:#fffdf8;
+      --muted:#69766e;
+      --line:#dfe4d8;
+      --serif:Georgia,'Times New Roman',serif;
+    }
+
+    *{box-sizing:border-box}
+
+    body{
+      margin:0;
+      background:var(--cream);
+      color:var(--ink);
+      font-family:Arial,Helvetica,sans-serif;
+    }
+
+    .wrap{
+      max-width:1180px;
+      margin:auto;
+      padding:0 28px;
+    }
+
+    .nav{
+      height:82px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+    }
+
+    .brand{
+      font-weight:800;
+      letter-spacing:-.06em;
+      font-size:24px;
+      display:flex;
+      align-items:center;
+      gap:10px;
+    }
+
+    .brand-mark{
+      width:31px;
+      height:31px;
+      border-radius:50% 50% 4px 50%;
+      background:var(--green);
+      display:inline-block;
+      position:relative;
+      transform:rotate(-35deg);
+    }
+
+    .brand-mark:after{
+      content:'';
+      position:absolute;
+      width:9px;
+      height:16px;
+      background:var(--lime);
+      left:11px;
+      top:6px;
+      border-radius:90% 0 90% 0;
+      transform:rotate(35deg);
+    }
+
+    .back{
+      background:#b98b4a;
+      color:white;
+      padding:12px 19px;
+      border-radius:999px;
+      font-weight:800;
+      font-size:13px;
+      text-decoration:none;
+      transition:.2s;
+    }
+
+    .back:hover{
+      background:var(--green);
+      transform:translateY(-2px);
+    }
+
+    .hero{
+      padding:70px 0 45px;
+      text-align:center;
+    }
+
+    .eyebrow{
+      display:inline-flex;
+      align-items:center;
+      gap:9px;
+      text-transform:uppercase;
+      letter-spacing:.13em;
+      font-size:11px;
+      font-weight:800;
+      color:var(--green);
+    }
+
+    .eyebrow:before{
+      content:'';
+      width:24px;
+      height:1px;
+      background:var(--green);
+    }
+
+    h1{
+      font:500 clamp(48px,6vw,76px)/.98 var(--serif);
+      letter-spacing:-.055em;
+      margin:22px auto 20px;
+      max-width:800px;
+    }
+
+    .intro{
+      max-width:650px;
+      margin:auto;
+      color:var(--muted);
+      font-size:16px;
+      line-height:1.7;
+    }
+
+    .values{
+      padding:35px 0 85px;
+    }
+
+    .values-grid{
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      gap:18px;
+    }
+
+    .value-card{
+      background:var(--paper);
+      border:1px solid var(--line);
+      border-radius:18px;
+      padding:28px 25px;
+      min-height:220px;
+      transition:.2s;
+    }
+
+    .value-card:hover{
+      transform:translateY(-3px);
+      border-color:#9eae9f;
+    }
+
+    .value-icon{
+      width:46px;
+      height:46px;
+      border-radius:14px;
+      background:#e9f0db;
+      display:grid;
+      place-items:center;
+      font-size:22px;
+    }
+
+    .value-card h2{
+      font:25px var(--serif);
+      margin:20px 0 9px;
+    }
+
+    .value-card p{
+      color:var(--muted);
+      font-size:13px;
+      line-height:1.65;
+      margin:0;
+    }
+
+    .commitment{
+      background:var(--green);
+      color:white;
+      padding:65px 0;
+      text-align:center;
+    }
+
+    .commitment h2{
+      font:42px var(--serif);
+      margin:0 0 15px;
+    }
+
+    .commitment p{
+      max-width:650px;
+      margin:0 auto 25px;
+      color:#d7e2db;
+      font-size:14px;
+      line-height:1.7;
+    }
+
+    .commitment a{
+      display:inline-block;
+      background:#b98b4a;
+      color:white;
+      padding:13px 21px;
+      border-radius:999px;
+      font-weight:800;
+      font-size:13px;
+      text-decoration:none;
+    }
+
+    .commitment a:hover{
+      background:#fff;
+      color:var(--green);
+    }
+
+    footer{
+      padding:28px 0;
+      background:var(--cream);
+      color:#738078;
+      font-size:11px;
+      text-align:center;
+    }
+
+    @media(max-width:800px){
+      .values-grid{
+        grid-template-columns:1fr;
+      }
+
+      .wrap{
+        padding:0 22px;
+      }
+
+      .hero{
+        padding-top:45px;
+      }
+
+      h1{
+        font-size:52px;
+      }
+    }
+
+    @media(max-width:480px){
+      .nav{
+        height:70px;
+      }
+
+      .brand{
+        font-size:21px;
+      }
+
+      .back{
+        padding:11px 15px;
+        font-size:12px;
+      }
+
+      h1{
+        font-size:45px;
+      }
+
+      .commitment h2{
+        font-size:36px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <header>
+    <div class="wrap nav">
+      <div class="brand">
+        <span class="brand-mark"></span>
+        Peace &amp; Unity
+      </div>
+
+      <a class="back" href="index.html">← Back to Peace &amp; Unity</a>
+    </div>
+  </header>
+
+  <main>
+
+    <section class="hero">
+      <div class="wrap">
+        <div class="eyebrow">What guides us</div>
+
+        <h1>Our Values</h1>
+
+        <p class="intro">
+          These principles shape how we want Peace &amp; Unity to serve people,
+          work with others, and grow.
+        </p>
+      </div>
+    </section>
+
+    <section class="values">
+      <div class="wrap">
+
+        <div class="values-grid">
+
+          <article class="value-card">
+            <div class="value-icon">❤️</div>
+            <h2>Compassion</h2>
+            <p>
+              We listen, care, and remember that every person carries a story
+              that deserves dignity.
+            </p>
+          </article>
+
+          <article class="value-card">
+            <div class="value-icon">🤝</div>
+            <h2>Unity</h2>
+            <p>
+              We believe positive change is stronger when people come together
+              and support one another.
+            </p>
+          </article>
+
+          <article class="value-card">
+            <div class="value-icon">🕊️</div>
+            <h2>Peace</h2>
+            <p>
+              We encourage kindness, understanding, respect, and peaceful ways
+              of building stronger communities.
+            </p>
+          </article>
+
+          <article class="value-card">
+            <div class="value-icon">🔎</div>
+            <h2>Transparency</h2>
+            <p>
+              We aim to communicate honestly about our work, support,
+              opportunities, and what we are still building.
+            </p>
+          </article>
+
+          <article class="value-card">
+            <div class="value-icon">🌱</div>
+            <h2>Hope</h2>
+            <p>
+              We want to encourage people to believe that difficult
+              circumstances do not have to define their future.
+            </p>
+          </article>
+
+          <article class="value-card">
+            <div class="value-icon">🙏</div>
+            <h2>Dignity</h2>
+            <p>
+              We seek to treat every person with respect and without
+              discrimination, regardless of their circumstances.
+            </p>
+          </article>
+
+        </div>
+      </div>
+    </section>
+
+    <section class="commitment">
+      <div class="wrap">
+        <h2>What we believe</h2>
+
+        <p>
+          Peace &amp; Unity is built on the belief that kindness, compassion,
+          and collective action can help create better opportunities for
+          people and communities.
+        </p>
+
+        <a href="index.html">← Back to homepage</a>
+      </div>
+    </section>
+
+  </main>
+
+  <footer>
+    <div class="wrap">
+      Peace &amp; Unity — Together We Can Make a Difference.
+    </div>
+  </footer>
+
+</body>
+</html>
