@@ -672,8 +672,11 @@ async function loadPeaceAndUnityContent(){
           grid.innerHTML="";
           if(!mediaItems.length){const empty=document.createElement("div");empty.className="media-empty";empty.textContent="Our first community pictures, videos, and stories will appear here soon.";grid.appendChild(empty);}
           mediaItems.forEach(item=>{
-            const card=document.createElement("article"); card.className="media-card"; card.dataset.mediaType=type;
-            const type=["image","video","story","project","news"].includes(item.type)?item.type:"story";
+            const card=document.createElement("article");
+card.className="media-card";
+const type=["image","video","story","project","news"].includes(item.type)?item.type:"story";
+card.dataset.mediaType=type;
+            
             const visual=document.createElement("div"); visual.className="media-visual "+(type==="video"?"video":type==="story"?"story-card":"");
             const badge=document.createElement("span"); badge.className="media-type"; badge.textContent=type==="image"?"Picture":type==="video"?"Video":type==="project"?"Project":type==="news"?"News / Update":"Story"; visual.appendChild(badge);
             if(type==="image"){const img=document.createElement("img"); img.className="media-photo"; img.src=item.url; img.alt=item.title||"Peace & Unity community photo"; img.loading="lazy"; img.onerror=()=>{visual.innerHTML="";visual.appendChild(badge);const fallback=document.createElement("span");fallback.textContent="📷";visual.appendChild(fallback);}; visual.appendChild(img);}
