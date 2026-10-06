@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Where We Work | Peace &amp; Unity</title>
+
+<style>
+:root{
+  --green:#18352b;
+  --gold:#b98b4a;
+  --cream:#f7f2e8;
+  --white:#ffffff;
+  --muted:#66736d;
+  --line:#ddd5c8;
+  --serif:Georgia,"Times New Roman",serif;
+  --sans:Arial,Helvetica,sans-serif;
+}
+
+*{box-sizing:border-box}
+
+body{
+  margin:0;
+  background:var(--cream);
+  color:var(--green);
+  font-family:var(--sans);
+  line-height:1.6;
+}
+
+.wrap{
+  width:min(1100px,92%);
+  margin:auto;
+}
+
+.hero{
+  background:var(--green);
+  color:white;
+  padding:80px 0 70px;
+}
+
+.eyebrow{
+  color:var(--gold);
+  font-size:13px;
+  font-weight:800;
+  letter-spacing:2px;
+  text-transform:uppercase;
+  margin-bottom:12px;
+}
+
+h1{
+  font:clamp(42px,7vw,72px) var(--serif);
+  line-height:1.05;
+  margin:0 0 20px;
+}
+
+.hero p{
+  max-width:720px;
+  margin:0;
+  color:#e7eee9;
+  font-size:18px;
+}
+
+.section{
+  padding:65px 0;
+}
+
+.section-head{
+  margin-bottom:32px;
+}
+
+.section-head h2{
+  font:38px var(--serif);
+  margin:0 0 10px;
+}
+
+.section-head p{
+  color:var(--muted);
+  max-width:720px;
+  margin:0;
+}
+
+.where-grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:22px;
+}
+
+.where-card{
+  background:white;
+  border:1px solid var(--line);
+  border-radius:22px;
+  padding:30px;
+}
+
+.where-icon{
+  width:64px;
+  height:64px;
+  border-radius:16px;
+  background:#f0e4cf;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  margin-bottom:20px;
+  overflow:hidden;
+  font-size:30px;
+}
+
+.where-icon img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  display:block;
+}
+
+.where-card h3{
+  font:25px var(--serif);
+  margin:0 0 10px;
+}
+
+.where-card p{
+  color:var(--muted);
+  margin:0;
+  font-size:15px;
+}
+
+.note{
+  margin-top:35px;
+  padding:30px;
+  border-radius:22px;
+  background:var(--green);
+  color:white;
+}
+
+.note h2{
+  font:28px var(--serif);
+  margin:0 0 8px;
+}
+
+.note p{
+  color:#dce6e0;
+  margin:0;
+  max-width:800px;
+}
+
+.back{
+  display:inline-block;
+  margin-top:30px;
+  background:var(--gold);
+  color:white;
+  text-decoration:none;
+  font-weight:800;
+  padding:12px 20px;
+  border-radius:999px;
+}
+
+@media(max-width:760px){
+  .where-grid{
+    grid-template-columns:1fr;
+  }
+
+  .hero{
+    padding:60px 0 55px;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<header class="hero">
+  <div class="wrap">
+    <div class="eyebrow">Our community focus</div>
+    <h1>Where We Work</h1>
+    <p>
+      Peace &amp; Unity is rooted in Uganda, with a focus on connecting
+      compassion and practical support with people and communities facing
+      difficult circumstances.
+    </p>
+
+    <a class="back" href="index.html">← Back to Peace &amp; Unity</a>
+  </div>
+</header>
+
+<main class="section">
+  <div class="wrap">
+
+    <div class="section-head">
+      <div class="eyebrow">Our focus</div>
+      <h2>Connecting support with communities</h2>
+      <p>
+        We want to understand local needs, listen to people, and build
+        responsible connections that can turn compassion into practical
+        support.
+      </p>
+    </div>
+
+    <div class="where-grid">
+
+      <article class="where-card">
+        <div class="where-icon">
+          <img src="assets/uganda-flag.jpg" alt="Uganda flag">
+        </div>
+        <h3>Uganda</h3>
+        <p>
+          Uganda is the starting point for Peace &amp; Unity and the
+          community we are committed to understanding and supporting.
+        </p>
+      </article>
+
+      <article class="where-card">
+        <div class="where-icon">🏘️</div>
+        <h3>Local communities</h3>
+        <p>
+          We aim to listen to local needs and connect support with
+          vulnerable families, children, and people who may be overlooked.
+        </p>
+      </article>
+
+      <article class="where-card">
+        <div class="where-icon">🌍</div>
+        <h3>Growing connections</h3>
+        <p>
+          As opportunities develop, Peace &amp; Unity can build responsible
+          connections with people and organisations beyond the immediate
+          community.
+        </p>
+      </article>
+
+    </div>
+
+    <div class="note">
+      <h2>Starting locally, growing responsibly.</h2>
+      <p>
+        Peace &amp; Unity believes meaningful change begins by understanding
+        the people and communities around us. As the organisation grows,
+        we hope to build wider connections while keeping compassion,
+        dignity, and responsible support at the centre of our work.
+      </p>
+    </div>
+
+  </div>
+</main>
+
+</body>
+</html>
