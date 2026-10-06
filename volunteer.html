@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Volunteer | Peace &amp; Unity</title>
+
+  <style>
+    :root{
+      --green:#18352b;
+      --gold:#b98b4a;
+      --cream:#f7f3ec;
+      --white:#ffffff;
+      --text:#26332e;
+      --muted:#68736e;
+      --line:#ded8ce;
+      --serif:Georgia,"Times New Roman",serif;
+    }
+
+    *{
+      box-sizing:border-box;
+    }
+
+    body{
+      margin:0;
+      background:var(--cream);
+      color:var(--text);
+      font-family:Arial,Helvetica,sans-serif;
+      line-height:1.7;
+    }
+
+    .wrap{
+      width:min(1100px,92%);
+      margin:auto;
+    }
+
+    header{
+      background:var(--green);
+      color:white;
+      padding:20px 0;
+    }
+
+    .header-inner{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:20px;
+    }
+
+    .brand{
+      color:white;
+      text-decoration:none;
+      font-family:var(--serif);
+      font-size:24px;
+      font-weight:bold;
+    }
+
+    nav{
+      display:flex;
+      flex-wrap:wrap;
+      gap:16px;
+      align-items:center;
+    }
+
+    nav a{
+      color:white;
+      text-decoration:none;
+      font-size:14px;
+      font-weight:bold;
+    }
+
+    nav a:hover{
+      color:#e1c28f;
+    }
+
+    .hero{
+      padding:80px 0 55px;
+      text-align:center;
+    }
+
+    .eyebrow{
+      color:var(--gold);
+      text-transform:uppercase;
+      letter-spacing:2px;
+      font-size:12px;
+      font-weight:bold;
+      margin-bottom:12px;
+    }
+
+    h1{
+      margin:0 auto 18px;
+      max-width:800px;
+      color:var(--green);
+      font-family:var(--serif);
+      font-size:clamp(40px,6vw,64px);
+      line-height:1.08;
+    }
+
+    .hero p{
+      max-width:720px;
+      margin:auto;
+      color:var(--muted);
+      font-size:17px;
+    }
+
+    .volunteer-grid{
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      gap:22px;
+      padding-bottom:70px;
+    }
+
+    .volunteer-card{
+      background:var(--white);
+      border:1px solid var(--line);
+      border-radius:20px;
+      padding:30px;
+      box-shadow:0 8px 25px rgba(24,53,43,.05);
+    }
+
+    .volunteer-icon{
+      font-size:38px;
+      margin-bottom:16px;
+    }
+
+    .volunteer-card h2{
+      color:var(--green);
+      font-family:var(--serif);
+      font-size:25px;
+      margin:0 0 10px;
+    }
+
+    .volunteer-card p{
+      color:var(--muted);
+      margin:0;
+      font-size:15px;
+    }
+
+    .commitment{
+      background:var(--green);
+      color:white;
+      border-radius:24px;
+      padding:45px;
+      margin-bottom:35px;
+    }
+
+    .commitment h2{
+      font-family:var(--serif);
+      font-size:32px;
+      margin:0 0 12px;
+    }
+
+    .commitment p{
+      margin:0;
+      color:#e6ebe7;
+      max-width:800px;
+    }
+
+    .cta{
+      text-align:center;
+      padding:0 0 70px;
+    }
+
+    .cta h2{
+      color:var(--green);
+      font-family:var(--serif);
+      font-size:32px;
+      margin:0 0 10px;
+    }
+
+    .cta p{
+      color:var(--muted);
+      max-width:650px;
+      margin:0 auto 20px;
+    }
+
+    .button{
+      display:inline-block;
+      background:var(--gold);
+      color:white;
+      text-decoration:none;
+      padding:13px 22px;
+      border-radius:999px;
+      font-weight:bold;
+      margin:6px;
+    }
+
+    .button:hover{
+      background:var(--green);
+    }
+
+    footer{
+      background:var(--green);
+      color:#dce4df;
+      text-align:center;
+      padding:28px 0;
+      font-size:13px;
+    }
+
+    @media(max-width:800px){
+      .header-inner{
+        flex-direction:column;
+      }
+
+      nav{
+        justify-content:center;
+      }
+
+      .volunteer-grid{
+        grid-template-columns:1fr;
+      }
+
+      .hero{
+        padding:60px 0 40px;
+      }
+
+      .commitment{
+        padding:30px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<header>
+  <div class="wrap header-inner">
+    <a class="brand" href="index.html">Peace &amp; Unity</a>
+
+    <nav>
+      <a href="index.html">Home</a>
+      <a href="story.html">Our Story</a>
+      <a href="help.html">How You Can Help</a>
+      <a href="impact.html">Our Impact</a>
+      <a href="support.html">Where Your Support Goes</a>
+      <a href="contact.html">Contact</a>
+      <a href="give.html">Make a Gift</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+
+  <section class="hero">
+    <div class="wrap">
+      <div class="eyebrow">Get involved</div>
+
+      <h1>Become a Volunteer</h1>
+
+      <p>
+        Peace &amp; Unity grows through people who are willing to give their
+        time, skills, compassion, and encouragement. You can be part of
+        building stronger communities, supporting families, and bringing
+        hope to people who need it.
+      </p>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap volunteer-grid">
+
+      <article class="volunteer-card">
+        <div class="volunteer-icon">🤝</div>
+        <h2>Give Your Time</h2>
+        <p>
+          Help with community activities, visits, outreach, and practical
+          support. Your time can make a meaningful difference to someone
+          who needs encouragement.
+        </p>
+      </article>
+
+      <article class="volunteer-card">
+        <div class="volunteer-icon">💡</div>
+        <h2>Share Your Skills</h2>
+        <p>
+          Contribute your knowledge, experience, or professional skills
+          where they can help Peace &amp; Unity and the communities we hope
+          to support.
+        </p>
+      </article>
+
+      <article class="volunteer-card">
+        <div class="volunteer-icon">📣</div>
+        <h2>Spread the Word</h2>
+        <p>
+          Tell others about Peace &amp; Unity and help connect people who
+          can support with people and communities who need support.
+        </p>
+      </article>
+
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap">
+      <div class="commitment">
+        <div class="eyebrow">Our commitment</div>
+        <h2>Every person has something valuable to give.</h2>
+        <p>
+          Volunteering is not only about money. It can be about giving time,
+          listening, sharing knowledge, offering encouragement, connecting
+          people, or simply being willing to help. Together, small acts of
+          kindness can become meaningful support.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section class="cta">
+    <div class="wrap">
+      <h2>Would you like to volunteer?</h2>
+
+      <p>
+        Get in touch with Peace &amp; Unity and tell us how you would like
+        to contribute.
+      </p>
+
+      <a class="button" href="mailto:peaceandunity42@gmail.com?subject=I%20would%20like%20to%20volunteer">
+        Volunteer with us ↗
+      </a>
+
+      <a class="button" href="index.html">
+        ← Back to Peace &amp; Unity
+      </a>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    Peace &amp; Unity — Together We Can Make a Difference.
+  </div>
+</footer>
+
+</body>
+</html>
