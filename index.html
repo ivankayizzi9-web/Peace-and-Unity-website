@@ -332,7 +332,6 @@
 </style>
 </head>
 <body>
-```
 
 <header class="wrap nav"><a class="brand" href="#top" aria-label="Peace and Unity home"><span class="brand-mark"></span>peace &amp; unity</a><nav class="nav-links"><a href="#mission">Mission</a><a href="#impact">Impact</a><a href="#help">How you can help</a><a href="#story">Stories</a><a href="#media">Media</a><a href="#faq">FAQ</a><a href="#contact">Contact</a></nav><a class="nav-cta" href="#give">Make a gift <span>↗</span></a></header>
 <main id="top">
@@ -674,7 +673,7 @@ card.dataset.mediaType=type;
             card.appendChild(visual);
             const body=document.createElement("div"); body.className="media-body"; const h3=document.createElement("h3"); h3.textContent=item.title||"Peace & Unity"; body.appendChild(h3);
             if(item.description){const p=document.createElement("p"); p.textContent=item.description; body.appendChild(p);}
-            if(type==="story"){const link=document.createElement("a"); link.className="media-link"; link.href="#tears-behind-our-smiles"; link.textContent="Read story →"; body.appendChild(link);}
+            if(type==="story"){const link=document.createElement("a"); link.className="media-link"; link.href="#story"; link.textContent="Read story →"; body.appendChild(link);}
             card.appendChild(body); grid.appendChild(card);
           });
         }
