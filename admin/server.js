@@ -283,6 +283,7 @@ app.get("/dashboard", requireAuth, async (req, res) => {
   const safeStory = String(story || "").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
   let mediaItems = []; try { mediaItems = JSON.parse(media || "[]"); } catch (_) { mediaItems = []; }
   let enquiryItems = []; try { enquiryItems = JSON.parse(enquiries || "[]"); } catch (_) { enquiryItems = []; }
+  let acknowledgementItems = []; try { acknowledgementItems = JSON.parse(acknowledgements || "[]"); } catch (_) { acknowledgementItems = []; }
   let donationData = {}; try { donationData = JSON.parse(donations || "{}"); } catch (_) { donationData = {}; }
   const donationMethods = [donationData.airtelMoney, donationData.mtnMoney, donationData.bank, donationData.accountNumber].filter(Boolean).length > 0 ? [donationData.airtelMoney, donationData.mtnMoney, donationData.bank && donationData.accountNumber ? "bank" : ""].filter(Boolean).length : 0;
   let lastUpdated = null;
