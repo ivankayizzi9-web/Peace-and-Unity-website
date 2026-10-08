@@ -829,6 +829,24 @@ async function loadPeaceAndUnityContent(){
 
     if(data.donations){
       const donations=JSON.parse(data.donations);
+
+      // Keep the public MTN card in sync with the value saved in Admin.
+      const mtnMethod=[...document.querySelectorAll('.support-method')].find(method=>
+        method.querySelector('.support-label')?.textContent.toLowerCase().includes('mtn')
+      );
+      if(mtnMethod){
+        if(String(donations.mtnMoney||"").trim()){
+          const phoneRow=[...mtnMethod.querySelectorAll('.support-detail')].find(row=>
+            row.querySelector('span')?.textContent.toLowerCase().includes('phone number')
+          );
+          const phoneValue=phoneRow?.querySelector('strong');
+          if(phoneValue) phoneValue.textContent=donations.mtnMoney;
+          mtnMethod.hidden=false;
+        }else{
+          mtnMethod.remove();
+        }
+      }
+
       const rows=[...document.querySelectorAll('.support-detail')];
       const values={
         airtelMoney:donations.airtelMoney,
