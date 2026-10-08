@@ -86,6 +86,16 @@ function enquiryRateLimit(req, res, next) {
   enquiryAttempts.set(key, entry);
   next();
 }
+function acknowledgementRateLimit(req, res, next) {
+  const now = Date.now();
+  const key = req.ip || "unknown";
+  const entry = acknowledgementAttempts.get(key) || { count: 0, resetAt: now + 15 * 60 * 1000 };
+  if (now > entry.resetAt) { entry.count = 0; entry.resetAt = now + 15 * 60 * 1000; }
+  if (entry.count >= 10) return res.status(429).json({ error: "Too many acknowledgement attempts. Please try again later." });
+  entry.count += 1;
+  acknowledgementAttempts.set(key, entry);
+  next();
+}
 function loginRateLimit(req, res, next) {
   const now = Date.now();
   const key = req.ip || "unknown";
