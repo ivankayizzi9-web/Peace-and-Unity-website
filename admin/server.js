@@ -231,7 +231,7 @@ app.post("/login", loginRateLimit, async (req, res) => {
   });
 });
 
-app.post("/logout", requireAuth, requireCsrf, (req, res) => req.session.destroy(() => res.redirect("/login")));
+ app.post("/logout", requireAuth, requireCsrf, (req, res) => {   req.session.destroy((error) => {     if (error) {       return res.status(500).send(         "Unable to log out securely. Please try again."       );     }      res.clearCookie("connect.sid", {       path: "/",       httpOnly: true,       secure: process.env.NODE_ENV === "production",       sameSite: "strict"     });      return res.redirect("/login");   }); });
 
 app.get("/admin/backup", requireAuth, async (req, res) => {
   try {
