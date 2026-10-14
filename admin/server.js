@@ -338,7 +338,8 @@ document.getElementById("closeStoryEditor")?.addEventListener("click", function 
 });
 </script>
 </body></html>`);
-}
+});
+
 
 
 app.post("/admin/story", requireAuth, requireCsrf, async (req, res) => {
