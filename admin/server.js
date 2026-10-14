@@ -327,7 +327,59 @@ ${storageReady ? (saved ? `<div class="notice" style="background:#e7f4e8">Saved 
 </div>
 <div class="card"><h2>Contact</h2><p class="muted">Update the public email address and WhatsApp number.</p><form method="post" action="/admin/contact"><input type="hidden" name="_csrf" value="${req.session.csrfToken}"><label>Email</label><input name="email" type="email" value="${JSON.parse(contact).email || ""}" required><label>WhatsApp</label><input name="whatsapp" value="${JSON.parse(contact).whatsapp || ""}" required><br><button type="submit">Save contact</button></form></div>
 
+<div class="card">
+  <h2>Donations</h2>
 
+
+  <p class="muted">Manage the mobile money and bank details shown on the public website.</p>
+  <form method="post" action="/admin/donations">
+    <input type="hidden" name="_csrf" value="${req.session.csrfToken}">
+    <label>Airtel Money</label>
+    <input name="airtelMoney" value="${esc(donationData.airtelMoney || "")}" required>
+    <label>MTN Mobile Money (optional)</label>
+    <input name="mtnMoney" value="${esc(donationData.mtnMoney || "")}">
+    <label>Account name</label>
+    <input name="accountName" value="${esc(donationData.accountName || "")}" required>
+    <label>Bank</label>
+    <input name="bank" value="${esc(donationData.bank || "")}" required>
+    <label>Account number</label>
+    <input name="accountNumber" value="${esc(donationData.accountNumber || "")}" required>
+    <label>Currency</label>
+    <input name="currency" value="${esc(donationData.currency || "UGX")}" required>
+    <button type="submit">Save donation details</button>
+  </form>
+</div>
+
+<div class="card">
+  <h2>Media Manager</h2>
+  <p class="muted">Add images, videos, stories, projects, or news updates.</p>
+  <form method="post" action="/admin/media/add">
+    <input type="hidden" name="_csrf" value="${req.session.csrfToken}">
+    <label>Media type</label>
+    <select name="type" required>
+      <option value="image">Image</option>
+      <option value="video">Video</option>
+      <option value="story">Story</option>
+      <option value="project">Project</option>
+      <option value="news">News / Update</option>
+    </select>
+    <label>Title</label>
+    <input name="title" required>
+    <label>Description</label>
+    <input name="description">
+    <label>Public image or video URL (required for images and videos)</label>
+    <input name="url" type="url" placeholder="https://">
+    <button type="submit">Add media</button>
+  </form>
+  <h3>Existing media</h3>
+  ${mediaRows}
+</div>
+
+<div class="card">
+  <h2>Terms &amp; Privacy Acknowledgements</h2>
+  <p class="muted">Website visitors who acknowledge the Terms and Privacy Policy appear here. These records are view-only.</p>
+  ${acknowledgementRows}
+</div>
 </div>
 <script>
 document.getElementById("openStoryEditor")?.addEventListener("click", function () {
