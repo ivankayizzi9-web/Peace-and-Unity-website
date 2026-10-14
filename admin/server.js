@@ -33,7 +33,7 @@ const DEFAULT_CONTACT = JSON.stringify({ email: "peaceandunity42@gmail.com", wha
 const DEFAULT_DONATIONS = JSON.stringify({ airtelMoney: "+256 742 119 378", mtnMoney: "", accountName: "Ivan Kayizzi", bank: "Equity Bank", accountNumber: "1003101355426", currency: "UGX" });
 
 app.set("trust proxy", 1);
-app.use(helmet());
+app.use(helmet({   contentSecurityPolicy: false }));
 app.use((req, res, next) => {
   res.setHeader("Access-Control-Allow-Origin", "https://peace-and-unity-website.onrender.com");
   res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
@@ -381,7 +381,7 @@ ${storageReady ? (saved ? `<div class="notice" style="background:#e7f4e8">Saved 
   ${acknowledgementRows}
 </div>
 </div>
-<script>
+<script nonce="${res.locals.cspNonce}">
 document.getElementById("openStoryEditor")?.addEventListener("click", function () {
   document.getElementById("storyEditor")?.showModal();
 });
