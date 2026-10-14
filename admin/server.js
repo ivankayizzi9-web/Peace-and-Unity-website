@@ -32,8 +32,25 @@ Peace & Unity — Together We Can Make a Difference.`;
 const DEFAULT_CONTACT = JSON.stringify({ email: "peaceandunity42@gmail.com", whatsapp: "+256 742 119 378" });
 const DEFAULT_DONATIONS = JSON.stringify({ airtelMoney: "+256 742 119 378", mtnMoney: "", accountName: "Ivan Kayizzi", bank: "Equity Bank", accountNumber: "1003101355426", currency: "UGX" });
 
+
 app.set("trust proxy", 1);
-app.use(helmet({   contentSecurityPolicy: false }));
+
+app.use((req, res, next) => {
+  res.locals.cspNonce = crypto.randomBytes(16).toString("base64");
+  next();
+});
+
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      scriptSrc: [
+        "'self'",
+        (req, res) => `'nonce-${res.locals.cspNonce}'`
+      ]
+    }
+  }
+}));
+
 app.use((req, res, next) => {
   res.setHeader("Access-Control-Allow-Origin", "https://peace-and-unity-website.onrender.com");
   res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
