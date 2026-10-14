@@ -306,7 +306,7 @@ ${storageReady ? (saved ? `<div class="notice" style="background:#e7f4e8">Saved 
       <h2>Stories</h2>
       <p class="muted">Manage the main story shown on the Peace &amp; Unity website.</p>
     </div>
-    <button type="button" onclick="document.getElementById('storyEditor').showModal()">Edit Story</button>
+    <button type="button" id="openStoryEditor">Edit Story</button>
   </div>
 
   <dialog id="storyEditor" style="width: min(700px, 90%); max-height: 80vh; overflow:auto; border:1px solid #dfe4d8; border-radius:18px; padding:24px; color:#17352d; background:#fffdf8;">
@@ -320,16 +320,26 @@ ${storageReady ? (saved ? `<div class="notice" style="background:#e7f4e8">Saved 
       <br>
       <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:14px">
         <button type="submit">Save Changes</button>
-        <button type="button" style="background:#69766e" onclick="document.getElementById('storyEditor').close()">Cancel</button>
+        <button type="button" id="closeStoryEditor" style="background:#69766e">Cancel</button>
       </div>
     </form>
   </dialog>
 </div>
 <div class="card"><h2>Contact</h2><p class="muted">Update the public email address and WhatsApp number.</p><form method="post" action="/admin/contact"><input type="hidden" name="_csrf" value="${req.session.csrfToken}"><label>Email</label><input name="email" type="email" value="${JSON.parse(contact).email || ""}" required><label>WhatsApp</label><input name="whatsapp" value="${JSON.parse(contact).whatsapp || ""}" required><br><button type="submit">Save contact</button></form></div>
 
-<div class="card"><h2>Donations</h2><p class="muted">Manage the public mobile money and bank donation details shown on the Peace &amp; Unity website.</p><div style="background:#f5f2e9;border-radius:14px;padding:16px;margin:15px 0"><strong>Current donation setup</strong><div class="muted" style="font-size:13px;margin-top:7px">Airtel Money: ${esc(donationData.airtelMoney || "Not set")} · MTN Mobile Money: ${esc(donationData.mtnMoney || "Not set")} · Bank: ${esc(donationData.bank || "Not set")} · Account: ${esc(donationData.accountNumber || "Not set")} · Currency: ${esc(donationData.currency || "Not set")}</div></div><form method="post" action="/admin/donations"><input type="hidden" name="_csrf" value="${req.session.csrfToken}"><label>Airtel Money</label><input name="airtelMoney" value="${esc(donationData.airtelMoney || "")}" required><label>MTN Mobile Money <span class="muted" style="font-weight:400">(optional)</span></label><input name="mtnMoney" value="${esc(donationData.mtnMoney || "")}" placeholder="+256 ..."><label>Account name</label><input name="accountName" value="${esc(donationData.accountName || "")}" required><label>Bank</label><input name="bank" value="${esc(donationData.bank || "")}" required><label>Account number</label><input name="accountNumber" value="${esc(donationData.accountNumber || "")}" required><label>Currency</label><input name="currency" value="${esc(donationData.currency || "")}" required><br><button type="submit">Save donation details</button></form></div><div class="card"><h2>Media Manager</h2><p class="muted">Add photos, videos, or stories using a public URL. These items will be stored safely in the content database.</p><form method="post" action="/admin/media/add"><input type="hidden" name="_csrf" value="${req.session.csrfToken}"><label>Type</label><select name="type" required><option value="image">Image</option><option value="video">Video</option><option value="story">Story</option><option value="project">Project</option><option value="news">News / Update</option></select><label>Title</label><input name="title" maxlength="120" required><label>Description</label><input name="description" maxlength="300"><label>Public URL</label><input name="url" type="url" placeholder="https://..."><p class="muted" style="font-size:12px">URL is optional for stories; images and videos need a public URL.</p><br><button type="submit">Add media</button></form><div style="margin-top:24px">${mediaRows}</div></div><div class="card"><h2>Terms &amp; Privacy Acknowledgements</h2><p class="muted">Anonymous records showing when visitors actively acknowledged the Terms and Privacy Policy. No name, email address, or IP address is stored.</p><div style="margin-top:18px">${acknowledgementRows}</div></div><div class="card"><h2>Enquiries</h2><p class="muted">Messages submitted through the public Peace &amp; Unity contact form appear here.</p><div style="margin-top:18px">${enquiryRows}</div></div>
-</div></body></html>`);
+
+</div>
+<script>
+document.getElementById("openStoryEditor")?.addEventListener("click", function () {
+  document.getElementById("storyEditor")?.showModal();
 });
+document.getElementById("closeStoryEditor")?.addEventListener("click", function () {
+  document.getElementById("storyEditor")?.close();
+});
+</script>
+</body></html>`);
+}
+
 
 app.post("/admin/story", requireAuth, requireCsrf, async (req, res) => {
   try { await saveContent("story", String(req.body.story || "").trim()); res.redirect("/dashboard?saved=story"); }
