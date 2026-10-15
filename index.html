@@ -1070,6 +1070,37 @@ card.dataset.mediaType=type;
         card.hidden=filter!=="all" && card.dataset.mediaType!==filter;
       });
     }));
+    
+    if(data.homepage){
+      try {
+        const homepageData = typeof data.homepage === "string"
+          ? JSON.parse(data.homepage)
+          : data.homepage;
+
+        if(homepageData.eyebrow){
+          const eyebrow = document.querySelector(".hero .eyebrow");
+          if(eyebrow) eyebrow.textContent = homepageData.eyebrow;
+        }
+
+        if(homepageData.heading){
+          const heading = document.querySelector(".hero h1");
+          if(heading) heading.textContent = homepageData.heading;
+        }
+
+        if(homepageData.intro){
+          const intro = document.querySelector(".hero-copy");
+          if(intro) intro.textContent = homepageData.intro;
+        }
+
+        if(homepageData.missionLead){
+          const missionLead = document.querySelector(".mission-lead");
+          if(missionLead) missionLead.textContent = homepageData.missionLead;
+        }
+      } catch(error) {
+        console.warn("Homepage content could not be loaded:", error);
+      }
+    }
+
     if(data.story){
       const storyText=String(data.story).trim();
       const makeParagraphs=(container, beforeSelector)=>{
