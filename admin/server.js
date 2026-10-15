@@ -209,7 +209,7 @@ app.post("/api/acknowledgements", acknowledgementRateLimit, async (req, res) => 
 app.get("/api/content", async (req, res) => {
   if (!pool) return res.status(503).json({ error: "Content storage is not configured." });
   try {
-    const result = await pool.query("SELECT key,value,updated_at FROM content WHERE key = ANY($1) ORDER BY key", [["story","contact","donations","media"]]);
+     const result = await pool.query("SELECT key,value,updated_at FROM content WHERE key = ANY($1) ORDER BY key", [["story","contact","donations","media","homepage"]]);
     res.json(Object.fromEntries(result.rows.map(row => [row.key, row.value])));
   } catch (error) { res.status(500).json({ error: "Unable to load content." }); }
 });
@@ -295,8 +295,8 @@ app.post("/admin/change-password", requireAuth, requireCsrf, async (req, res) =>
 });
 
 app.get("/dashboard", requireAuth, async (req, res) => {
-  let story = "", contact = DEFAULT_CONTACT, donations = DEFAULT_DONATIONS, media = "[]", enquiries = "[]", acknowledgements = "[]", storageReady = Boolean(pool), saved = String(req.query.saved || "");
-  if (pool) { try { story = await getContent("story"); contact = await getContent("contact"); donations = await getContent("donations"); media = await getContent("media"); enquiries = await getContent("enquiries"); acknowledgements = await getContent("acknowledgements"); } catch (_) { storageReady = false; } }
+  let story = "", homepage = "{}", contact = DEFAULT_CONTACT, donations = DEFAULT_DONATIONS, media = "[]", enquiries = "[]", acknowledgements = "[]", storageReady = Boolean(pool), saved = String(req.query.saved || "");
+  if (pool) { try { story = await getContent("story"); homepage = await getContent("homepage"); contact = await getContent("contact"); donations = await getContent("donations"); media = await getContent("media"); enquiries = await getContent("enquiries"); acknowledgements = await getContent("acknowledgements"); } catch (_) { storageReady = false; } }
   const safeStory = String(story || "").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
   let mediaItems = []; try { mediaItems = JSON.parse(media || "[]"); } catch (_) { mediaItems = []; }
   let enquiryItems = []; try { enquiryItems = JSON.parse(enquiries || "[]"); } catch (_) { enquiryItems = []; }
@@ -414,6 +414,22 @@ document.getElementById("closeStoryEditor")?.addEventListener("click", function 
 app.post("/admin/story", requireAuth, requireCsrf, async (req, res) => {
   try { await saveContent("story", String(req.body.story || "").trim()); res.redirect("/dashboard?saved=story"); }
   catch (error) { res.status(503).send('Content storage is not connected yet. <a href="/dashboard">Back to dashboard</a>.'); }
+});
+
+app.post("/admin/homepage", requireAuth, requireCsrf, async (req, res) => {
+  try {
+    const homepage = {
+      eyebrow: String(req.body.eyebrow || "").trim(),
+      heading: String(req.body.heading || "").trim(),
+      intro: String(req.body.intro || "").trim(),
+      missionLead: String(req.body.missionLead || "").trim()
+    };
+
+    await saveContent("homepage", JSON.stringify(homepage));
+    res.redirect("/dashboard?saved=homepage");
+  } catch (error) {
+    res.status(503).send('Homepage could not be saved. <a href="/dashboard">Back to dashboard</a>.');
+  }
 });
 
 app.post("/admin/contact", requireAuth, requireCsrf, async (req, res) => {
