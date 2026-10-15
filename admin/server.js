@@ -302,6 +302,14 @@ app.get("/dashboard", requireAuth, async (req, res) => {
   let enquiryItems = []; try { enquiryItems = JSON.parse(enquiries || "[]"); } catch (_) { enquiryItems = []; }
   let acknowledgementItems = []; try { acknowledgementItems = JSON.parse(acknowledgements || "[]"); } catch (_) { acknowledgementItems = []; }
   let donationData = {}; try { donationData = JSON.parse(donations || "{}"); } catch (_) { donationData = {}; }
+ 
+  let homepageData = {};
+  try {
+    homepageData = JSON.parse(homepage || "{}");
+  } catch (_) {
+    homepageData = {};
+  }
+
   const donationMethods = [donationData.airtelMoney, donationData.mtnMoney, donationData.bank, donationData.accountNumber].filter(Boolean).length > 0 ? [donationData.airtelMoney, donationData.mtnMoney, donationData.bank && donationData.accountNumber ? "bank" : ""].filter(Boolean).length : 0;
   let lastUpdated = null;
   if (pool) { try { const updated = await pool.query("SELECT MAX(updated_at) AS last_updated FROM content"); lastUpdated = updated.rows[0]?.last_updated || null; } catch (_) {} }
@@ -340,8 +348,46 @@ ${storageReady ? (saved ? `<div class="notice" style="background:#e7f4e8">Saved 
         <button type="button" id="closeStoryEditor" style="background:#69766e">Cancel</button>
       </div>
     </form>
+
   </dialog>
 </div>
+
+<div class="card">
+  <div class="top">
+    <div>
+      <h2>Homepage Editor</h2>
+      <p class="muted">Update the main heading and introductory text on your homepage.</p>
+    </div>
+    <button type="button" id="openHomepageEditor">Edit Homepage</button>
+  </div>
+
+  <dialog id="homepageEditor" style="width:min(700px,90%);max-height:80vh;overflow:auto;border:1px solid #dfe4d8;border-radius:18px;padding:24px;color:#17352d;background:#fffdf8;">
+    <h2>Edit Homepage</h2>
+    <p class="muted">Update the fields below, then save your changes.</p>
+
+    <form method="post" action="/admin/homepage">
+      <input type="hidden" name="_csrf" value="${req.session.csrfToken}">
+
+      <label for="homepageEyebrow">Small tagline above the heading</label>
+      <input id="homepageEyebrow" name="eyebrow" value="${esc(homepageData.eyebrow || 'Give hope. Build peace.')}" required>
+
+      <label for="homepageHeading">Main heading</label>
+      <input id="homepageHeading" name="heading" value="${esc(homepageData.heading || 'Together, we can make a difference.')}" required>
+
+      <label for="homepageIntro">Introductory paragraph</label>
+      <textarea id="homepageIntro" name="intro" required>${esc(homepageData.intro || 'Peace & Unity is a community-focused charity initiative dedicated to supporting vulnerable families, children, and people facing difficult circumstances. Through compassion, practical support, and community action, we aim to bring hope, restore dignity, and build stronger, more caring communities.')}</textarea>
+
+      <label for="homepageMissionLead">Mission statement</label>
+      <textarea id="homepageMissionLead" name="missionLead" required>${esc(homepageData.missionLead || 'To bring hope, practical support, and opportunity closer to people and communities facing difficult circumstances.')}</textarea>
+
+      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:14px">
+        <button type="submit">Save Homepage</button>
+        <button type="button" id="closeHomepageEditor" style="background:#69766e">Cancel</button>
+      </div>
+    </form>
+  </dialog>
+</div>
+
 <div class="card"><h2>Contact</h2><p class="muted">Update the public email address and WhatsApp number.</p><form method="post" action="/admin/contact"><input type="hidden" name="_csrf" value="${req.session.csrfToken}"><label>Email</label><input name="email" type="email" value="${JSON.parse(contact).email || ""}" required><label>WhatsApp</label><input name="whatsapp" value="${JSON.parse(contact).whatsapp || ""}" required><br><button type="submit">Save contact</button></form></div>
 
 <div class="card">
@@ -398,6 +444,7 @@ ${storageReady ? (saved ? `<div class="notice" style="background:#e7f4e8">Saved 
   ${acknowledgementRows}
 </div>
 </div>
+
 <script nonce="${res.locals.cspNonce}">
 document.getElementById("openStoryEditor")?.addEventListener("click", function () {
   document.getElementById("storyEditor")?.showModal();
@@ -405,9 +452,17 @@ document.getElementById("openStoryEditor")?.addEventListener("click", function (
 document.getElementById("closeStoryEditor")?.addEventListener("click", function () {
   document.getElementById("storyEditor")?.close();
 });
+
+document.getElementById("openHomepageEditor")?.addEventListener("click", function () {
+  document.getElementById("homepageEditor")?.showModal();
+});
+document.getElementById("closeHomepageEditor")?.addEventListener("click", function () {
+  document.getElementById("homepageEditor")?.close();
+});
 </script>
 </body></html>`);
 });
+
 
 
 
