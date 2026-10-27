@@ -93,6 +93,27 @@
 .media-card{background:var(--paper);border:1px solid var(--line);border-radius:18px;overflow:hidden;transition:.2s}
 .media-card:hover{transform:translateY(-3px);border-color:#9eae9f}
 .media-visual{height:205px;position:relative;display:flex;align-items:center;justify-content:center;background:linear-gradient(145deg,#d8e2c0,#7f9b78);font-size:48px}
+  .media-visual img{
+  width:100%;
+  height:100%;
+  display:block;
+  object-fit:cover;
+  object-position:center;
+}
+
+.media-visual .media-type{
+  z-index:2;
+}
+
+.media-visual.video{
+  overflow:hidden;
+}
+
+@media(max-width:800px){
+  .media-visual{
+    height:230px;
+  }
+}
 .media-visual.video{background:linear-gradient(145deg,#c9d7b1,#52775a)}
 .media-visual.story-card{background:linear-gradient(145deg,#f0dfbd,#a6bd91)}
 .media-play{position:absolute;bottom:14px;left:14px;width:42px;height:42px;border:0;border-radius:50%;background:white;color:var(--green);font-size:18px;display:grid;place-items:center;box-shadow:0 6px 18px #26392c20}
