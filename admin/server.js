@@ -217,9 +217,9 @@ app.get("/api/content", async (req, res) => {
 app.get("/", (req, res) => req.session.authenticated ? res.redirect("/dashboard") : res.redirect("/login"));
 
 app.get("/login", async (req, res) => {
-  res.type("html").send(`<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Peace & Unity — Admin Login</title>
+  res.type("html").send(`<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Brighter Future Foundation — Admin Login</title>
 <style>body{margin:0;background:#f5f2e9;color:#17352d;font-family:Arial,sans-serif;min-height:100vh;display:grid;place-items:center;padding:20px}.card{width:min(420px,100%);background:#fffdf8;padding:34px;border-radius:20px;box-shadow:0 18px 50px #17352d18}h1{font:40px Georgia,serif;margin:0 0 8px}.muted{color:#69766e;line-height:1.6;font-size:14px}label{display:block;font-size:12px;font-weight:700;margin:20px 0 7px}input{width:100%;box-sizing:border-box;padding:13px;border:1px solid #dfe4d8;border-radius:9px;font-size:14px}button{width:100%;margin-top:22px;padding:14px;border:0;border-radius:999px;background:#27634e;color:#fff;font-weight:700;cursor:pointer}.note{margin-top:18px;font-size:11px;color:#69766e}</style></head><body><main class="card"><div style="font-size:28px">🌱</div><h1>Admin login</h1>
-${String(req.query.changed || "") === "1" ? `<div style="padding:12px 15px;border-radius:10px;background:#e7f4e8;margin:15px 0">Password changed successfully. Please sign in with your new password.</div>` : ""}<p class="muted">Private management area for Peace &amp; Unity.</p>
+${String(req.query.changed || "") === "1" ? `<div style="padding:12px 15px;border-radius:10px;background:#e7f4e8;margin:15px 0">Password changed successfully. Please sign in with your new password.</div>` : ""}<p class="muted">Private management area for Brighter Future Foundation.</p>
 ${(await configured()) ? `<form method="post" action="/login"><input type="hidden" name="_csrf" value="${req.session.csrfToken}"><label for="email">Email</label><input id="email" name="email" type="email" autocomplete="username" required><label for="password">Password</label><input id="password" name="password" type="password" autocomplete="current-password" required><button type="submit">Sign in</button></form>` : `<p class="muted"><strong>Admin setup is not finished yet.</strong><br>Please configure the admin password in Render before signing in.</p>`}<p class="note">Your password is never stored in this website's public files.</p></main></body></html>`);
 });
 
@@ -331,7 +331,7 @@ ${storageReady ? (saved ? `<div class="notice" style="background:#e7f4e8">Saved 
   <div class="top">
     <div>
       <h2>Stories</h2>
-      <p class="muted">Manage the main story shown on the Brighter Future Foundation website. &amp; Unity website.</p>
+      <p class="muted"><p class="muted">Manage the main story shown on the Brighter Future Foundation website.</p></p>
     </div>
     <button type="button" id="openStoryEditor">Edit Story</button>
   </div>
@@ -371,13 +371,13 @@ ${storageReady ? (saved ? `<div class="notice" style="background:#e7f4e8">Saved 
       <input type="hidden" name="_csrf" value="${req.session.csrfToken}">
 
       <label for="homepageEyebrow">Small tagline above the heading</label>
-      <input id="homepageEyebrow" name="eyebrow" value="${esc(homepageData.eyebrow || 'Give hope. Build peace.')}" required>
+      <input id="homepageEyebrow" name="eyebrow" value="${esc(homepageData.eyebrow || 'Growing Together, Brighter Futures.')}" required>
 
       <label for="homepageHeading">Main heading</label>
       <input id="homepageHeading" name="heading" value="${esc(homepageData.heading || 'Together, we can make a difference.')}" required>
 
       <label for="homepageIntro">Introductory paragraph</label>
-      <textarea id="homepageIntro" name="intro" required>${esc(homepageData.intro || 'Peace & Unity is a community-focused charity initiative dedicated to supporting vulnerable families, children, and people facing difficult circumstances. Through compassion, practical support, and community action, we aim to bring hope, restore dignity, and build stronger, more caring communities.')}</textarea>
+      <textarea id="homepageIntro" name="intro" required>${esc(homepageData.intro || 'Brighter Future Foundation is dedicated to supporting vulnerable children, promoting access to education, and helping families experiencing poverty through compassion, practical support, and community action.')}</textarea>
 
       <label for="homepageMissionLead">Mission statement</label>
       <textarea id="homepageMissionLead" name="missionLead" required>${esc(homepageData.missionLead || 'To bring hope, practical support, and opportunity closer to people and communities facing difficult circumstances.')}</textarea>
