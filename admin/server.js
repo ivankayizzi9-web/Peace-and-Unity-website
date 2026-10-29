@@ -169,7 +169,7 @@ async function saveContent(key, value) {
 app.get("/health", async (req, res) => {
   let database = false;
   if (pool) { try { await pool.query("SELECT 1"); database = true; } catch (_) {} }
-  res.status(200).json({ ok: true, service: "Peace & Unity Admin", configured: await configured(), database, passwordHashConfigured: Boolean(ADMIN_PASSWORD_HASH || (await getStoredPasswordHash().catch(() => ""))), sessionStore: pool ? "postgres" : "memory" });
+  res.status(200).json({ ok: true, service: "Brighter Future Foundation Admin", configured: await configured(), database, passwordHashConfigured: Boolean(ADMIN_PASSWORD_HASH || (await getStoredPasswordHash().catch(() => ""))), sessionStore: pool ? "postgres" : "memory" });
 });
 
 app.post("/api/enquiries", enquiryRateLimit, async (req, res) => {
@@ -254,8 +254,10 @@ app.get("/admin/backup", requireAuth, async (req, res) => {
   try {
     const backup = {
       exportedAt: new Date().toISOString(),
-      service: "Peace & Unity Admin",
-      content: {
+      service: "Brighter Future Foundation Admin",
+           content: {
+        homepage: JSON.parse(await getContent("homepage") || "{}"),
+        enquiries: JSON.parse(await getContent("enquiries") || "[]"),
         story: await getContent("story"),
         contact: JSON.parse(await getContent("contact")),
         donations: JSON.parse(await getContent("donations")),
@@ -263,7 +265,7 @@ app.get("/admin/backup", requireAuth, async (req, res) => {
         acknowledgements: JSON.parse(await getContent("acknowledgements") || "[]")
       }
     };
-    const filename = `peace-unity-backup-${new Date().toISOString().slice(0,10)}.json`;
+    const filename = `brighter-future-backup-${new Date().toISOString().slice(0,10)}.json`;
     res.setHeader("Content-Type", "application/json; charset=utf-8");
     res.setHeader("Content-Disposition", `attachment; filename="${filename}"`);
     res.send(JSON.stringify(backup, null, 2));
