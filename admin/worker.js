@@ -1,203 +1,56 @@
+const KEYS = ["homepage","story","contact","donations","media","enquiries","acknowledgements"];
 const DEFAULTS = {
-  story: {},
-  contact: {},
-  donations: {},
-  media: [],
-  enquiries: [],
-  acknowledgements: []
+  homepage: {eyebrow:"Supporting Children. Empowering Families.",heading:"Building a Brighter Future for Every Child.",intro:"Brighter Future Foundation supports vulnerable children, promotes education access, and helps families experiencing poverty through compassion, practical assistance and community support.",missionLead:"To support vulnerable children, promote access to quality education, and help families experiencing poverty meet their basic needs with dignity and hope."},
+  story: "", contact:{email:"brighterfuturefoundation85@gmail.com",whatsapp:"+256 742 119 378"},
+  donations:{airtelMoney:"+256 742 119 378",mtnMoney:"",accountName:"Ivan Kayizzi",bank:"Equity Bank",accountNumber:"1003101355426",currency:"UGX"},
+  media:[], enquiries:[], acknowledgements:[]
 };
-
-const SCHEMA = `
-CREATE TABLE IF NOT EXISTS content (
-  key TEXT PRIMARY KEY,
-  value TEXT NOT NULL,
-  updated_at TEXT DEFAULT CURRENT_TIMESTAMP
-);
-CREATE TABLE IF NOT EXISTS admin_config (
-  key TEXT PRIMARY KEY,
-  value TEXT NOT NULL,
-  updated_at TEXT DEFAULT CURRENT_TIMESTAMP
-);
-`;
-
-async function initialize(db) {
-  await db.exec(SCHEMA);
+const schema = \`
+CREATE TABLE IF NOT EXISTS content(key TEXT PRIMARY KEY,value TEXT NOT NULL,updated_at TEXT DEFAULT CURRENT_TIMESTAMP);
+CREATE TABLE IF NOT EXISTS admin_config(key TEXT PRIMARY KEY,value TEXT NOT NULL,updated_at TEXT DEFAULT CURRENT_TIMESTAMP);
+CREATE TABLE IF NOT EXISTS sessions(token_hash TEXT PRIMARY KEY,csrf TEXT NOT NULL,expires_at INTEGER NOT NULL);
+CREATE TABLE IF NOT EXISTS reset_tokens(token_hash TEXT PRIMARY KEY,expires_at INTEGER NOT NULL,used INTEGER DEFAULT 0);
+CREATE TABLE IF NOT EXISTS rate_limits(bucket TEXT PRIMARY KEY,count INTEGER NOT NULL,reset_at INTEGER NOT NULL);
+\`;
+const enc = new TextEncoder();
+const htmlEscape = v => String(v ?? "").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const json = (data,status=200,headers={}) => new Response(JSON.stringify(data),{status,headers:{"Content-Type":"application/json; charset=utf-8","Cache-Control":"no-store",...headers}});
+async function digest(v){const b=await crypto.subtle.digest("SHA-256",enc.encode(v));return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,"0")).join("");}
+async function passwordHash(p,salt){const key=await crypto.subtle.importKey("raw",enc.encode(p),"PBKDF2",false,["deriveBits"]);const bits=await crypto.subtle.deriveBits({name:"PBKDF2",salt:enc.encode(salt),iterations:210000,hash:"SHA-256"},key,256);return [...new Uint8Array(bits)].map(x=>x.toString(16).padStart(2,"0")).join("");}
+async function checkPassword(p,stored){if(!stored||!stored.startsWith("pbkdf2$"))return false;const [,salt,hash]=stored.split("$");return await passwordHash(p,salt)===hash;}
+async function makePassword(p){const salt=crypto.randomUUID()+crypto.randomUUID();return "pbkdf2$"+salt+"$"+await passwordHash(p,salt);}
+async function init(db){await db.exec(schema);for(const k of KEYS){const v=await db.prepare("SELECT key FROM content WHERE key=?").bind(k).first();if(!v)await db.prepare("INSERT INTO content(key,value) VALUES(?,?)").bind(k,JSON.stringify(DEFAULTS[k])).run();}}
+async function get(db,k){const r=await db.prepare("SELECT value FROM content WHERE key=?").bind(k).first();if(!r)return DEFAULTS[k];try{return JSON.parse(r.value)}catch{return r.value}}
+async function put(db,k,v){await db.prepare("INSERT INTO content(key,value,updated_at) VALUES(?,?,CURRENT_TIMESTAMP) ON CONFLICT(key) DO UPDATE SET value=excluded.value,updated_at=CURRENT_TIMESTAMP").bind(k,JSON.stringify(v)).run();}
+function cookie(req,n){const s=req.headers.get("Cookie")||"";const p=s.split(";").map(x=>x.trim()).find(x=>x.startsWith(n+"="));return p?decodeURIComponent(p.slice(n.length+1)):"";}
+function setCookie(v,age=28800){return "bf_admin="+encodeURIComponent(v)+"; HttpOnly; Secure; SameSite=Strict; Path=/; Max-Age="+age;}
+function page(title,body){return new Response(\`<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>\${title} — Brighter Future Foundation</title><style>
+*{box-sizing:border-box}body{margin:0;background:#f5f2e9;color:#17352d;font:15px Arial,sans-serif}.wrap{max-width:1000px;margin:auto;padding:28px 18px}h1{font:40px Georgia,serif;margin:8px 0}h2{font:26px Georgia,serif;margin:0 0 8px}.muted{color:#69766e;line-height:1.6}.card{background:#fffdf8;border:1px solid #dfe4d8;border-radius:16px;padding:22px;margin:18px 0}.login{max-width:440px;margin:8vh auto}.brand{font-size:28px}label{display:block;font-size:12px;font-weight:bold;margin:14px 0 6px}input,textarea,select{width:100%;padding:12px;border:1px solid #dfe4d8;border-radius:9px;font:14px Arial;margin:4px 0}textarea{min-height:120px;resize:vertical}button,.btn{display:inline-block;background:#27634e;color:white;border:0;border-radius:999px;padding:12px 18px;font-weight:bold;text-decoration:none;cursor:pointer;margin-top:10px}.secondary{background:#69766e}.danger{background:#963e3e}.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.stat{background:#edf2e9;padding:15px;border-radius:12px;color:#17352d;text-decoration:none}.stat strong{display:block;font:28px Georgia}.row{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}.item{padding:12px 0;border-top:1px solid #e5e8df;overflow-wrap:anywhere}.notice{padding:12px;background:#e7f4e8;border-radius:9px;margin:12px 0}.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}@media(max-width:650px){.grid,.stats{grid-template-columns:1fr 1fr}h1{font-size:34px}}
+</style></head><body>\${body}</body></html>\`,{headers:{"Content-Type":"text/html; charset=utf-8","Cache-Control":"no-store"}});}
+async function limit(db,key,max=8){const now=Date.now(),r=await db.prepare("SELECT count,reset_at FROM rate_limits WHERE bucket=?").bind(key).first();if(r&&r.reset_at>now&&r.count>=max)return false;const count=r&&r.reset_at>now?r.count+1:1;await db.prepare("INSERT INTO rate_limits(bucket,count,reset_at) VALUES(?,?,?) ON CONFLICT(bucket) DO UPDATE SET count=excluded.count,reset_at=excluded.reset_at").bind(key,count,now+900000).run();return true;}
+async function session(req,env){const token=cookie(req,"bf_admin");if(!token)return null;const hash=await digest(token),s=await env.DB.prepare("SELECT csrf,expires_at FROM sessions WHERE token_hash=?").bind(hash).first();if(!s||s.expires_at<Date.now()){if(s)await env.DB.prepare("DELETE FROM sessions WHERE token_hash=?").bind(hash).run();return null;}return {tokenHash:hash,csrf:s.csrf};}
+function formData(req){return req.formData();}
+function redirect(path){return new Response(null,{status:303,headers:{Location:path}});}
+async function sendReset(env,email,token){if(!env.RESEND_API_KEY)return false;const resp=await fetch("https://api.resend.com/emails",{method:"POST",headers:{Authorization:"Bearer "+env.RESEND_API_KEY,"Content-Type":"application/json"},body:JSON.stringify({from:env.EMAIL_FROM||"Brighter Future Foundation <onboarding@resend.dev>",to:[email],subject:"Reset your admin password",html:\`<p>A password reset was requested for your Brighter Future Foundation admin account.</p><p><a href="\${env.ADMIN_URL||"https://brighter-future-admin.workers.dev"}/reset-password?token=\${encodeURIComponent(token)}">Reset password</a></p><p>This link expires in 30 minutes. If you did not request this, ignore this email.</p>\`})});return resp.ok;}
+async function handle(req,env){
+ await init(env.DB);const u=new URL(req.url),p=u.pathname,m=req.method;
+ if(p==="/health"&&m==="GET")return json({ok:true,service:"Brighter Future Admin",database:true});
+ if(p==="/api/content"&&m==="GET"){const out={};for(const k of KEYS)out[k]=await get(env.DB,k);return json(out);}
+ if(p==="/api/enquiries"&&m==="POST"){if(!await limit(env.DB,"enquiry:"+ (req.headers.get("CF-Connecting-IP")||"unknown"),5))return json({error:"Too many messages. Please try again later."},429);const b=await req.json().catch(()=>({}));if(String(b.website||"").trim())return json({error:"Unable to send message."},400);const name=String(b.name||"").trim().slice(0,100),email=String(b.email||"").trim().slice(0,160),message=String(b.message||"").trim().slice(0,2000);if(!name||!/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email)||!message)return json({error:"Please provide a name, valid email and message."},400);const a=await get(env.DB,"enquiries");a.unshift({id:crypto.randomUUID(),name,email,message,createdAt:new Date().toISOString(),status:"new"});await put(env.DB,"enquiries",a.slice(0,200));return json({ok:true},201);}
+ if(p==="/api/acknowledgements"&&m==="POST"){const b=await req.json().catch(()=>({}));if(b.acknowledged!==true)return json({error:"Acknowledgement is required."},400);const a=await get(env.DB,"acknowledgements");a.unshift({id:crypto.randomUUID(),acknowledgedAt:new Date().toISOString(),source:"website"});await put(env.DB,"acknowledgements",a.slice(0,500));return json({ok:true},201);}
+ if(p==="/login"&&m==="GET"){const s=await session(req,env);if(s)return redirect("/dashboard");return page("Admin Login",\`<main class="wrap login"><section class="card"><div class="brand">🌱</div><h1>Admin login</h1><p class="muted">Private management area for Brighter Future Foundation.</p>\${u.searchParams.has("error")?'<p class="notice">Login details could not be verified.</p>':""}<form method="post" action="/login"><label>Email</label><input name="email" type="email" autocomplete="username" required><label>Password</label><input name="password" type="password" autocomplete="current-password" required><button type="submit">Sign in</button></form><p><a href="/forgot-password">Forgot password?</a></p></section></main>\`);}
+ if(p==="/login"&&m==="POST"){const ip=req.headers.get("CF-Connecting-IP")||"unknown";if(!await limit(env.DB,"login:"+ip,8))return redirect("/login?error=1");const f=await formData(req),email=String(f.get("email")||"").trim().toLowerCase(),pw=String(f.get("password")||"");const admin=(env.ADMIN_EMAIL||"brighterfuturefoundation85@gmail.com").toLowerCase();let stored=(await env.DB.prepare("SELECT value FROM admin_config WHERE key='password_hash'").first())?.value||"";if(!stored&&env.ADMIN_INITIAL_PASSWORD){stored=await makePassword(env.ADMIN_INITIAL_PASSWORD);await env.DB.prepare("INSERT INTO admin_config(key,value) VALUES('password_hash',?)").bind(stored).run();}if(email!==admin||!(await checkPassword(pw,stored)))return redirect("/login?error=1");const token=crypto.randomUUID()+crypto.randomUUID(),csrf=crypto.randomUUID()+crypto.randomUUID();await env.DB.prepare("INSERT INTO sessions(token_hash,csrf,expires_at) VALUES(?,?,?)").bind(await digest(token),csrf,Date.now()+28800000).run();return new Response(null,{status:303,headers:{Location:"/dashboard","Set-Cookie":setCookie(token)}});}
+ if(p==="/forgot-password"&&m==="GET")return page("Forgot Password",\`<main class="wrap login"><section class="card"><h1>Forgot password?</h1><p class="muted">Enter the admin email address. If recovery is configured, a reset link will be sent.</p><form method="post"><label>Admin email</label><input type="email" name="email" required><button>Send reset link</button></form><p><a href="/login">Back to login</a></p></section></main>\`);
+ if(p==="/forgot-password"&&m==="POST"){const f=await formData(req),email=String(f.get("email")||"").trim().toLowerCase(),admin=(env.ADMIN_EMAIL||"brighterfuturefoundation85@gmail.com").toLowerCase(),ip=req.headers.get("CF-Connecting-IP")||"unknown";if(await limit(env.DB,"reset:"+ip,4)&&email===admin&&env.RESEND_API_KEY){const token=crypto.randomUUID()+crypto.randomUUID();await env.DB.prepare("INSERT INTO reset_tokens(token_hash,expires_at,used) VALUES(?,?,0)").bind(await digest(token),Date.now()+1800000).run();await sendReset(env,email,token);}return page("Password Recovery",'<main class="wrap login"><section class="card"><h1>Check your email</h1><p class="muted">If the address matches the admin account and email delivery is configured, a reset link will arrive shortly.</p><a class="btn" href="/login">Back to login</a></section></main>');}
+ if(p==="/reset-password"&&m==="GET"){const token=u.searchParams.get("token")||"",r=await env.DB.prepare("SELECT expires_at,used FROM reset_tokens WHERE token_hash=?").bind(await digest(token)).first();if(!r||r.used||r.expires_at<Date.now())return page("Reset Link Expired",'<main class="wrap login"><section class="card"><h1>Reset link unavailable</h1><p class="muted">This link is invalid or has expired. Request a new one.</p><a href="/forgot-password">Request another link</a></section></main>');return page("Choose New Password",\`<main class="wrap login"><section class="card"><h1>Choose a new password</h1><form method="post"><input type="hidden" name="token" value="\${htmlEscape(token)}"><label>New password (at least 12 characters)</label><input type="password" name="password" minlength="12" required><label>Confirm password</label><input type="password" name="confirm" minlength="12" required><button>Save new password</button></form></section></main>\`);}
+ if(p==="/reset-password"&&m==="POST"){const f=await formData(req),token=String(f.get("token")||""),pw=String(f.get("password")||""),confirm=String(f.get("confirm")||""),hash=await digest(token),r=await env.DB.prepare("SELECT expires_at,used FROM reset_tokens WHERE token_hash=?").bind(hash).first();if(!r||r.used||r.expires_at<Date.now()||pw.length<12||pw!==confirm)return page("Unable to Reset",'<main class="wrap login"><section class="card"><p class="muted">The reset link or password details are invalid. Please try again.</p><a href="/forgot-password">Request a new link</a></section></main>');await env.DB.prepare("UPDATE admin_config SET value=?,updated_at=CURRENT_TIMESTAMP WHERE key='password_hash'").bind(await makePassword(pw)).run();await env.DB.prepare("UPDATE reset_tokens SET used=1 WHERE token_hash=?").bind(hash).run();await env.DB.prepare("DELETE FROM sessions").run();return redirect("/login?changed=1");}
+ const s=await session(req,env);
+ if(p==="/logout"&&m==="POST"){if(s)await env.DB.prepare("DELETE FROM sessions WHERE token_hash=?").bind(s.tokenHash).run();return new Response(null,{status:303,headers:{Location:"/login","Set-Cookie":setCookie("",0)}});}
+ if(p.startsWith("/admin")||p==="/dashboard"){if(!s)return redirect("/login");if(m==="POST"){const f=await formData(req);if(String(f.get("_csrf")||"")!==s.csrf)return new Response("Security check failed. Please return to the dashboard and try again.",{status:403});}}
+ if(p==="/dashboard"&&m==="GET"){const vals={};for(const k of KEYS)vals[k]=await get(env.DB,k);const donation=vals.donations||{},methodCount=[donation.airtelMoney,donation.mtnMoney,donation.bank&&donation.accountNumber].filter(Boolean).length;const card=(name,count,href)=>\`<a class="stat" href="\${href}"><strong>\${count}</strong>\${name}</a>\`;const csrf=s.csrf;const form=(title,action,fields)=>\`<section class="card"><h2>\${title}</h2><form method="post" action="\${action}"><input type="hidden" name="_csrf" value="\${csrf}">\${fields}<button>Save changes</button></form></section>\`;const field=(label,name,value,type="text")=>\`<label>\${label}</label><input name="\${name}" type="\${type}" value="\${htmlEscape(value)}">\`;const area=(label,name,value)=>\`<label>\${label}</label><textarea name="\${name}">\${htmlEscape(value)}</textarea>\`;const media=vals.media||[],enq=vals.enquiries||[],acks=vals.acknowledgements||[];return page("Admin Dashboard",\`<main class="wrap"><header class="row"><div><div class="brand">🌱</div><h1>Admin Dashboard</h1><p class="muted">Brighter Future Foundation management area</p></div><form method="post" action="/logout"><input type="hidden" name="_csrf" value="\${csrf}"><button class="secondary">Log out</button></form></header><section class="card"><h2>Overview</h2><p class="muted">Select a card to open its management section.</p><div class="stats">\${card("Story",vals.story?1:0,"#story")}\${card("Media items",media.length,"#media")}\${card("Donation methods",methodCount,"#donations")}\${card("Contact details",vals.contact?.email?"✓":"—","#contact")}\${card("Enquiries",enq.length,"#enquiries")}\${card("Acknowledgements",acks.length,"#acknowledgements")}</div><p><a href="/admin/backup">Download content backup</a></p></section>\${form("Homepage Editor","/admin/homepage",field("Tagline","eyebrow",vals.homepage.eyebrow)+field("Main heading","heading",vals.homepage.heading)+area("Introduction","intro",vals.homepage.intro)+area("Mission statement","missionLead",vals.homepage.missionLead))}<div id="story">\${form("Stories","/admin/story",area("Story content","story",vals.story))}</div><div id="contact">\${form("Contact","/admin/contact",field("Email","email",vals.contact.email,"email")+field("WhatsApp","whatsapp",vals.contact.whatsapp))}</div><div id="donations">\${form("Donations","/admin/donations",field("Airtel Money","airtelMoney",donation.airtelMoney)+field("MTN Mobile Money","mtnMoney",donation.mtnMoney)+field("Account name","accountName",donation.accountName)+field("Bank","bank",donation.bank)+field("Account number","accountNumber",donation.accountNumber)+field("Currency","currency",donation.currency))}</div><div id="media"><section class="card"><h2>Media Manager</h2><form method="post" action="/admin/media/add"><input type="hidden" name="_csrf" value="\${csrf}"><label>Type</label><select name="type"><option>image</option><option>video</option><option>story</option><option>project</option><option>news</option></select>\${field("Title","title","")}\${field("Description","description","")}\${field("Public URL","url","") }<button>Add media</button></form>\${media.map((x,i)=>\`<div class="item"><b>\${htmlEscape(x.title)}</b> — \${htmlEscape(x.type)}<form method="post" action="/admin/media/delete"><input type="hidden" name="_csrf" value="\${csrf}"><input type="hidden" name="index" value="\${i}"><button class="danger">Delete</button></form></div>\`).join("")||'<p class="muted">No media items yet.</p>'}</section></div><div id="enquiries"><section class="card"><h2>Enquiries</h2>\${enq.map((x,i)=>\`<div class="item"><b>\${htmlEscape(x.name)}</b> · \${htmlEscape(x.email)}<p>\${htmlEscape(x.message)}</p><small>\${htmlEscape(x.createdAt||"")}</small><form method="post" action="/admin/enquiries/delete"><input type="hidden" name="_csrf" value="\${csrf}"><input type="hidden" name="index" value="\${i}"><button class="danger">Delete</button></form></div>\`).join("")||'<p class="muted">No enquiries.</p>'}</section></div><div id="acknowledgements"><section class="card"><h2>Terms &amp; Privacy Acknowledgements</h2>\${acks.map(x=>\`<div class="item">Acknowledged · \${htmlEscape(x.acknowledgedAt||"")} · \${htmlEscape(x.source||"")}</div>\`).join("")||'<p class="muted">No acknowledgements.</p>'}</section></div>\${form("Change password","/admin/change-password",'<label>Current password</label><input type="password" name="currentPassword" required><label>New password</label><input type="password" name="newPassword" minlength="12" required><label>Confirm new password</label><input type="password" name="confirmPassword" minlength="12" required')}</main>\`);}
+ if(p==="/admin/backup"&&m==="GET"){const out={exportedAt:new Date().toISOString(),service:"Brighter Future Foundation Admin",content:{}};for(const k of KEYS)out.content[k]=await get(env.DB,k);return new Response(JSON.stringify(out,null,2),{headers:{"Content-Type":"application/json","Content-Disposition":'attachment; filename="brighter-future-backup.json"',"Cache-Control":"no-store"}});}
+ if(p==="/admin/homepage"&&m==="POST"){await put(env.DB,"homepage",{eyebrow:String((await formData(req)).get("eyebrow")||""),heading:String((await formData(req)).get("heading")||"")});return redirect("/dashboard");}
+ if(p.startsWith("/admin/")&&m==="POST"){const f=await formData(req),v=n=>String(f.get(n)||"").trim();if(p==="/admin/story")await put(env.DB,"story",v("story"));else if(p==="/admin/contact")await put(env.DB,"contact",{email:v("email"),whatsapp:v("whatsapp")});else if(p==="/admin/donations")await put(env.DB,"donations",{airtelMoney:v("airtelMoney"),mtnMoney:v("mtnMoney"),accountName:v("accountName"),bank:v("bank"),accountNumber:v("accountNumber"),currency:v("currency")});else if(p==="/admin/media/add"){const type=v("type"),url=v("url");if(!["image","video","story","project","news"].includes(type))return json({error:"Invalid media type"},400);if(url&&!/^https?:\\/\\//i.test(url))return json({error:"URL must start with http or https"},400);const a=await get(env.DB,"media");a.push({type,title:v("title"),description:v("description"),url,createdAt:new Date().toISOString()});await put(env.DB,"media",a);}else if(p==="/admin/media/delete"||p==="/admin/enquiries/delete"){const key=p.includes("media")?"media":"enquiries",a=await get(env.DB,key),i=Number(v("index"));if(Number.isInteger(i)&&i>=0&&i<a.length)a.splice(i,1);await put(env.DB,key,a);}else if(p==="/admin/change-password"){const old=v("currentPassword"),next=v("newPassword");const stored=(await env.DB.prepare("SELECT value FROM admin_config WHERE key='password_hash'").first())?.value||"";if(!(await checkPassword(old,stored))||next.length<12||next!==v("confirmPassword"))return new Response("Password change failed. Check your current password and ensure the new password matches and has at least 12 characters.",{status:400});await env.DB.prepare("UPDATE admin_config SET value=?,updated_at=CURRENT_TIMESTAMP WHERE key='password_hash'").bind(await makePassword(next)).run();await env.DB.prepare("DELETE FROM sessions").run();return redirect("/login");}return redirect("/dashboard");}
+ return new Response("Not found",{status:404});
 }
-
-function json(data, status = 200) {
-  return new Response(JSON.stringify(data), {
-    status,
-    headers: {
-      "Content-Type": "application/json; charset=utf-8",
-      "Cache-Control": "no-store"
-    }
-  });
-}
-
-function unauthorized() {
-  return json({ error: "Please log in again." }, 401);
-}
-
-async function getValue(db, table, key) {
-  const row = await db.prepare(
-    `SELECT value FROM ${table} WHERE key = ?`
-  ).bind(key).first();
-
-  if (!row) return null;
-
-  try {
-    return JSON.parse(row.value);
-  } catch {
-    return row.value;
-  }
-}
-
-async function saveValue(db, table, key, value) {
-  await db.prepare(`
-    INSERT INTO ${table} (key, value, updated_at)
-    VALUES (?, ?, CURRENT_TIMESTAMP)
-    ON CONFLICT(key) DO UPDATE SET
-      value = excluded.value,
-      updated_at = CURRENT_TIMESTAMP
-  `).bind(key, JSON.stringify(value)).run();
-}
-
-function cookieValue(request, name) {
-  const cookie = request.headers.get("Cookie") || "";
-  const item = cookie.split(";").map(v => v.trim())
-    .find(v => v.startsWith(name + "="));
-  return item ? item.substring(name.length + 1) : null;
-}
-
-async function sha256(value) {
-  const bytes = new TextEncoder().encode(value);
-  const hash = await crypto.subtle.digest("SHA-256", bytes);
-  return Array.from(new Uint8Array(hash))
-    .map(b => b.toString(16).padStart(2, "0")).join("");
-}
-
-async function verifyPassword(password, stored) {
-  if (!stored) return false;
-
-  // Existing bcrypt hashes must be migrated securely before login is enabled.
-  if (stored.startsWith("$2")) return false;
-
-  return (await sha256(password)) === stored;
-}
-
-function secureCookie(value, maxAge = 86400) {
-  return `bf_admin=${value}; HttpOnly; Secure; SameSite=Strict; Path=/; Max-Age=${maxAge}`;
-}
-
-async function authenticated(request, env) {
-  const token = cookieValue(request, "bf_admin");
-  if (!token || !env.SESSION_SECRET) return false;
-
-  const expected = await sha256(env.SESSION_SECRET + ":" + token);
-  const stored = await env.DB.prepare(
-    "SELECT value FROM admin_config WHERE key = 'active_session'"
-  ).first();
-
-  return !!stored && stored.value === expected;
-}
-
-async function handle(request, env) {
-  await initialize(env.DB);
-
-  const url = new URL(request.url);
-  const path = url.pathname;
-  const method = request.method;
-
-  if (path === "/health" && method === "GET") {
-    return json({ service: "Brighter Future Admin", database: true });
-  }
-
-  if (path === "/login" && method === "POST") {
-    const body = await request.json().catch(() => ({}));
-    const password = String(body.password || "");
-
-    const configured = await getValue(env.DB, "admin_config", "password_hash");
-    const envHash = env.ADMIN_PASSWORD_HASH || "";
-
-    const valid = await verifyPassword(password, configured || envHash);
-
-    if (!valid) return json({ error: "Invalid login details." }, 401);
-
-    const token = crypto.randomUUID();
-    const sessionHash = await sha256(env.SESSION_SECRET + ":" + token);
-
-    await saveValue(env.DB, "admin_config", "active_session", sessionHash);
-
-    return new Response(JSON.stringify({ success: true }), {
-      headers: {
-        "Content-Type": "application/json",
-        "Set-Cookie": secureCookie(token)
-      }
-    });
-  }
-
-  if (path === "/logout" && method === "POST") {
-    await env.DB.prepare(
-      "DELETE FROM admin_config WHERE key = 'active_session'"
-    ).run();
-
-    return new Response(JSON.stringify({ success: true }), {
-      headers: {
-        "Content-Type": "application/json",
-        "Set-Cookie": secureCookie("", 0)
-      }
-    });
-  }
-
-  if (path.startsWith("/admin/") && !(await authenticated(request, env))) {
-    return unauthorized();
-  }
-
-  if (path === "/api/content" && method === "GET") {
-    const result = {};
-
-    for (const key of Object.keys(DEFAULTS)) {
-      result[key] = await getValue(env.DB, "content", key);
-      if (result[key] === null) result[key] = DEFAULTS[key];
-    }
-
-    return json(result);
-  }
-
-  if (path === "/admin/backup" && method === "GET") {
-    const backup = {};
-
-    for (const key of Object.keys(DEFAULTS)) {
-      backup[key] = await getValue(env.DB, "content", key) ?? DEFAULTS[key];
-    }
-
-    return json({
-      exportedAt: new Date().toISOString(),
-      content: backup
-    });
-  }
-
-  if (path === "/admin/change-password" && method === "POST") {
-    const body = await request.json().catch(() => ({}));
-    const password = String(body.password || "");
-
-    if (password.length < 12) {
-      return json({ error: "Password must be at least 12 characters." }, 400);
-    }
-
-    await saveValue(env.DB, "admin_config", "password_hash", await sha256(password));
-    return json({ success: true });
-  }
-
-  return json({ error: "Not found." }, 404);
-}
-
-export default {
-  async fetch(request, env) {
-    try {
-      return await handle(request, env);
-    } catch (error) {
-      return json({ error: "The admin service encountered an error." }, 500);
-    }
-  }
-};
+export default {async fetch(request,env){try{return await handle(request,env);}catch(e){return new Response("The admin service encountered an error.",{status:500});}}};
