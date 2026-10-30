@@ -1,7 +1,7 @@
 name = "brighter-future-admin"
 main = "worker.js"
 compatibility_date = "2026-10-30"
-
+compatibility_flags = ["nodejs_compat"]
 [[d1_databases]]
 binding = "DB"
 database_name = "brighter-future-admin"
