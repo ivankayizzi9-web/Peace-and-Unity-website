@@ -1,0 +1,8 @@
+name = "brighter-future-admin"
+main = "worker.js"
+compatibility_date = "2026-10-30"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "brighter-future-admin"
+database_id = "5f989e09-c3a2-4768-9c65-73806553ae3a"
