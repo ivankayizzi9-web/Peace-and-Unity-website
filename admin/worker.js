@@ -98,7 +98,17 @@ function safeUrl(value) {
   catch { return ""; }
 }
 function nav() {
-  return `<nav class="nav"><a href="/dashboard">Dashboard</a><a href="/admin/story">Stories</a><a href="/admin/media">Media</a><a href="/admin/donations">Donations</a><a href="/admin/contact">Contact</a><a href="/admin/enquiries">Enquiries</a><a href="/admin/acknowledgements">Acknowledgements</a><a href="/admin/backup">Download Backup</a></nav>`;
+  return `<nav class="nav">
+    <a href="/dashboard">Dashboard</a>
+    <a href="/admin/story">Stories</a>
+    <a href="/admin/media">Media</a>
+    <a href="/admin/donations">Donations</a>
+    <a href="/admin/contact">Contact</a>
+    <a href="/admin/enquiries">Enquiries</a>
+    <a href="/admin/acknowledgements">Acknowledgements</a>
+    <a href="/admin/backup">Download Backup</a>
+    <a href="https://peace-and-unity-website.pages.dev/" target="_blank" rel="noopener">View Website ↗</a>
+  </nav>`;
 }
 function shell(title,content,s) {
   return page(title,`<main class="wrap"><div class="row"><div><div class="brand">🌱 Brighter Future Foundation</div><p class="muted">Administration dashboard</p></div><form method="post" action="/logout"><input type="hidden" name="csrf" value="${htmlEscape(s.csrf)}"><button class="secondary">Sign out</button></form></div>${nav()}${content}</main>`);
