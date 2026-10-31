@@ -266,45 +266,26 @@ async function handle(req,env) {
       ];
       return shell("Dashboard",`<section><h1>Welcome back</h1><p class="muted">Manage Brighter Future Foundation website content and visitor messages.</p>${saved}<div class="stats"><a class="stat" href="/admin/enquiries"><strong>${enquiries.length}</strong>Enquiries</a><a class="stat" href="/admin/media"><strong>${media.length}</strong>Media items</a><a class="stat" href="/admin/acknowledgements"><strong>${acks.length}</strong>Acknowledgements</a></div><div class="grid">${cards.map(c=>`<a class="card stat" href="${c[0]}"><h2>${htmlEscape(c[1])}</h2><p class="muted">${htmlEscape(c[2])}</p><strong style="font: bold 15px Arial">${htmlEscape(c[3])} →</strong></a>`).join("")}</div></section>`,s);
     }
-    if (p==="/admin/story"&&m==="GET") {
-      const story=await get(env.DB,"story");
-      return editor("Stories","/admin/story",area("Story page content (plain text)","story",typeof story==="string"?story:JSON.stringify(story,null,2))+`<p class="muted small">This saves the story content stored for the public website.</p>`,s);
-    }
-    if (p==="/admin/media"&&m==="GET") {
-      const items=await get(env.DB,"media");
-      const list=items.length?items.map(x=>`<div class="item"><div class="row"><div><strong>${htmlEscape(x.title||"Untitled")}</strong><div class="muted small">${htmlEscape(x.type||"media")} · ${htmlEscape(x.description||"")}</div><a href="${htmlEscape(safeUrl(x.url)||"#")}" target="_blank" rel="noopener noreferrer">Open media</a></div><form method="post" action="/admin/media/delete"><input type="hidden" name="csrf" value="${htmlEscape(s.csrf)}"><input type="hidden" name="id" value="${htmlEscape(x.id)}"><button class="danger">Delete</button></form></div></div>`).join(""):'<p class="muted">No media items have been added yet.</p>';
-      return shell("Media Manager",`<section class="card"><h1>Media Manager</h1><p class="muted">Add a public image, video, story, project or news link.</p>${saved}<form method="post" action="/admin/media"><input type="hidden" name="csrf" value="${htmlEscape(s.csrf)}"><label>Type</label><select name="type"><option>image</option><option>video</option><option>story</option><option>project</option><option>news</option></select>${field("Title","title","")}${field("Media URL (must begin with http:// or https://)","url","", "url")}${area("Description","description","")}<button>Add media item</button></form></section><section class="card"><h2>Current media items (${items.length})</h2>${list}</section>`,s);
-    }
-    if (p==="/admin/donations"&&m==="GET") {
-      const d=await get(env.DB,"donations");
-      return editor("Donations","/admin/donations",saved+field("Airtel Money number","airtelMoney",d.airtelMoney)+field("MTN Mobile Money number","mtnMoney",d.mtnMoney)+field("Account name","accountName",d.accountName)+field("Bank","bank",d.bank)+field("Account number","accountNumber",d.accountNumber)+`<label>Currency</label><select name="currency"><option value="UGX" ${d.currency==="UGX"?"selected":""}>UGX</option><option value="USD" ${d.currency==="USD"?"selected":""}>USD</option></select>`,s);
-    }
-    if (p==="/admin/contact"&&m==="GET") {
-      const c=await get(env.DB,"contact");
-      return editor("Contact Details","/admin/contact",saved+field("Public email address","email",c.email,"email")+field("WhatsApp number","whatsapp",c.whatsapp),s);
-    }
-    if (p==="/admin/enquiries"&&m==="GET") {
+       if (p==="/admin/enquiries"&&m==="GET") {
       const items=await get(env.DB,"enquiries");
-      const list=items.length?items.map(x=>`<div class="item"><div class="row"><strong>${htmlEscape(x.name||"Visitor")} · ${htmlEscape(x.status||"new")}</strong><span class="muted small">${htmlEscape(x.createdAt||"")}</span></div><p><a href="mailto:${htmlEscape(x.email||"")}">${htmlEscape(x.email||"")}</a></p><p>${htmlEscape(x.message||"")}</p><form method="post" action="/admin/enquiries/status"><input type="hidden" name="csrf" value="${htmlEscape(s.csrf)}"><input type="hidden" name="id" value="${htmlEscape(x.id)}"><select name="status"><option value="new" ${x.status==="new"?"selected":""}>New</option><option value="read" ${x.status==="read"?"selected":""}>Read</option><option value="resolved" ${x.status==="resolved"?"selected":""}>Resolved</option></select><button>Update status</button></form></div>`).join(""):'<p class="muted">No enquiries received yet.</p>';
+      const list=items.length?items.map(x=>`<div class="item">
+        <div class="row">
+          <strong>${htmlEscape(x.name||"Visitor")} · ${htmlEscape(x.status||"new")}</strong>
+          <span class="muted small">${htmlEscape(x.createdAt||"")}</span>
+        </div>
+        <p><a href="mailto:${htmlEscape(x.email||"")}">${htmlEscape(x.email||"")}</a></p>
+        <a class="btn" href="mailto:${htmlEscape(x.email||"")}?subject=${encodeURIComponent("Re: Your enquiry to Brighter Future Foundation")}">Reply by Email</a>
+        <p>${htmlEscape(x.message||"")}</p>
+        <form method="post" action="/admin/enquiries/status">
+          <input type="hidden" name="csrf" value="${htmlEscape(s.csrf)}">
+          <input type="hidden" name="id" value="${htmlEscape(x.id)}">
+          <select name="status">
+            <option value="new" ${x.status==="new"?"selected":""}>New</option>
+            <option value="read" ${x.status==="read"?"selected":""}>Read</option>
+            <option value="resolved" ${x.status==="resolved"?"selected":""}>Resolved</option>
+          </select>
+          <button>Update status</button>
+        </form>
+      </div>`).join(""):'<p class="muted">No enquiries received yet.</p>';
       return shell("Enquiries",`<section class="card"><h1>Visitor Enquiries (${items.length})</h1>${list}</section>`,s);
     }
-    if (p==="/admin/acknowledgements"&&m==="GET") {
-      const items=await get(env.DB,"acknowledgements");
-      const list=items.length?items.map(x=>`<div class="item"><strong>${htmlEscape(x.source||"website")}</strong><p class="muted">${htmlEscape(x.acknowledgedAt||"")}</p></div>`).join(""):'<p class="muted">No acknowledgements recorded yet.</p>';
-      return shell("Terms & Privacy Acknowledgements",`<section class="card"><h1>Terms & Privacy Acknowledgements</h1><p class="muted">Records submitted by visitors through the website.</p>${list}</section>`,s);
-    }
-    return shell("Not Found",'<section class="card"><h1>Page not found</h1><a href="/dashboard">Return to dashboard</a></section>',s);
-  }
-  return page("Not Found",'<main class="wrap"><h1>Page not found</h1><a href="/login">Admin login</a></main>');
-}
-
-export default {
-  async fetch(request,env) {
-    try {
-      return await handle(request,env);
-    } catch (e) {
-      console.error("Admin Worker error:", e);
-      return new Response("The admin service encountered an error.",{status:500});
-    }
-  }
-};
