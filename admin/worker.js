@@ -290,7 +290,11 @@ async function handle(req,env) {
 
 export default {
   async fetch(request,env) {
-    try { return await handle(request,env); }
-    catch (e) { return new Response("The admin service encountered an error.",{status:500}); }
+    try {
+      return await handle(request,env);
+    } catch (e) {
+      console.error("Admin Worker error:", e);
+      return new Response("The admin service encountered an error.",{status:500});
+    }
   }
 };
