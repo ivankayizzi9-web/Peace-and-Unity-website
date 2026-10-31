@@ -288,6 +288,25 @@ async function handle(req,env) {
         </form>
       </section>`,s);
     }
+        if (p==="/admin/contact"&&m==="GET") {
+      const c=await get(env.DB,"contact")||{};
+      return shell("Contact Details",`<section class="card">
+        <h1>Contact Details</h1>
+        <p class="muted">Manage the foundation's public contact information.</p>
+        ${saved}
+        <form method="post" action="/admin/contact">
+          <input type="hidden" name="csrf" value="${htmlEscape(s.csrf)}">
+
+          <label>Public Email Address</label>
+          <input type="email" name="email" value="${htmlEscape(c.email||"")}">
+
+          <label>WhatsApp Number</label>
+          <input name="whatsapp" value="${htmlEscape(c.whatsapp||"")}">
+
+          <button type="submit">Save Contact Details</button>
+        </form>
+      </section>`,s);
+    }
     if (p==="/dashboard"||p==="/admin"||p==="/admin/") {
       const [media,enquiries,acks]=await Promise.all([get(env.DB,"media"),get(env.DB,"enquiries"),get(env.DB,"acknowledgements")]);
       const cards=[
