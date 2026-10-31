@@ -98,7 +98,7 @@ function safeUrl(value) {
   catch { return ""; }
 }
 function nav() {
-  return `<nav class="nav"><a href="/dashboard">Dashboard</a><a href="/admin/story">Stories</a><a href="/admin/media">Media</a><a href="/admin/donations">Donations</a><a href="/admin/contact">Contact</a><a href="/admin/enquiries">Enquiries</a><a href="/admin/acknowledgements">Acknowledgements</a></nav>`;
+  return `<nav class="nav"><a href="/dashboard">Dashboard</a><a href="/admin/story">Stories</a><a href="/admin/media">Media</a><a href="/admin/donations">Donations</a><a href="/admin/contact">Contact</a><a href="/admin/enquiries">Enquiries</a><a href="/admin/acknowledgements">Acknowledgements</a><a href="/admin/backup">Download Backup</a></nav>`;
 }
 function shell(title,content,s) {
   return page(title,`<main class="wrap"><div class="row"><div><div class="brand">🌱 Brighter Future Foundation</div><p class="muted">Administration dashboard</p></div><form method="post" action="/logout"><input type="hidden" name="csrf" value="${htmlEscape(s.csrf)}"><button class="secondary">Sign out</button></form></div>${nav()}${content}</main>`);
@@ -194,6 +194,18 @@ async function handle(req,env) {
   }
 
   const s=await session(req,env);
+  if (p==="/admin/backup"&&m==="GET") {
+    if (!s) return redirect("/login");
+    const content={};
+    for (const k of KEYS) content[k]=await get(env.DB,k);
+    const backup={exportedAt:new Date().toISOString(),service:"Brighter Future Admin",content};
+    return new Response(JSON.stringify(backup,null,2),{headers:{
+      "Content-Type":"application/json; charset=utf-8",
+      "Content-Disposition":"attachment; filename=brighter-future-admin-backup.json",
+      "Cache-Control":"no-store",
+      "X-Content-Type-Options":"nosniff"
+    }});
+  }
   if (p==="/logout"&&m==="POST") {
     const f=await formData(req);
     if (!s||String(f.get("csrf")||"")!==s.csrf) return json({error:"Your session expired. Please sign in again."},403);
