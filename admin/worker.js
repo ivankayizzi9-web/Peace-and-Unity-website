@@ -254,6 +254,20 @@ async function handle(req,env) {
       return json({error:"Unknown management action."},404);
     }
     const saved=u.searchParams.has("saved")?'<p class="notice">Changes saved successfully.</p>':"";
+        if (p==="/admin/story"&&m==="GET") {
+      const story=await get(env.DB,"story")||"";
+      return shell("Stories",`<section class="card">
+        <h1>Foundation Story</h1>
+        <p class="muted">Edit the story displayed on the Brighter Future Foundation website.</p>
+        ${saved}
+        <form method="post" action="/admin/story">
+          <input type="hidden" name="csrf" value="${htmlEscape(s.csrf)}">
+          <label>Foundation Story</label>
+          <textarea name="story" rows="16">${htmlEscape(story)}</textarea>
+          <button type="submit">Save Story</button>
+        </form>
+      </section>`,s);
+    }
         if (p==="/admin/donations"&&m==="GET") {
       const d=await get(env.DB,"donations")||{};
       return shell("Donations",`<section class="card">
