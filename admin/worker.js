@@ -289,3 +289,17 @@ async function handle(req,env) {
       </div>`).join(""):'<p class="muted">No enquiries received yet.</p>';
       return shell("Enquiries",`<section class="card"><h1>Visitor Enquiries (${items.length})</h1>${list}</section>`,s);
     }
+    return new Response("Page not found.", {status:404});
+  }
+}
+
+export default {
+  async fetch(request,env) {
+    try {
+      return await handle(request,env);
+    } catch (e) {
+      console.error("Admin Worker error:", e);
+      return new Response("The admin service encountered an error.",{status:500});
+    }
+  }
+};
