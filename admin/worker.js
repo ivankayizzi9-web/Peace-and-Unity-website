@@ -254,6 +254,40 @@ async function handle(req,env) {
       return json({error:"Unknown management action."},404);
     }
     const saved=u.searchParams.has("saved")?'<p class="notice">Changes saved successfully.</p>':"";
+        if (p==="/admin/donations"&&m==="GET") {
+      const d=await get(env.DB,"donations")||{};
+      return shell("Donations",`<section class="card">
+        <h1>Donation Details</h1>
+        <p class="muted">Manage the mobile money and bank details displayed on the website.</p>
+        ${saved}
+        <form method="post" action="/admin/donations">
+          <input type="hidden" name="csrf" value="${htmlEscape(s.csrf)}">
+
+          <label>Airtel Money</label>
+          <input name="airtelMoney" value="${htmlEscape(d.airtelMoney||"")}">
+
+          <label>MTN Mobile Money</label>
+          <input name="mtnMoney" value="${htmlEscape(d.mtnMoney||"")}">
+
+          <label>Account Name</label>
+          <input name="accountName" value="${htmlEscape(d.accountName||"")}">
+
+          <label>Bank</label>
+          <input name="bank" value="${htmlEscape(d.bank||"")}">
+
+          <label>Account Number</label>
+          <input name="accountNumber" value="${htmlEscape(d.accountNumber||"")}">
+
+          <label>Currency</label>
+          <select name="currency">
+            <option value="UGX" ${d.currency==="UGX"?"selected":""}>UGX - Ugandan Shillings</option>
+            <option value="USD" ${d.currency==="USD"?"selected":""}>USD - US Dollars</option>
+          </select>
+
+          <button type="submit">Save Donation Details</button>
+        </form>
+      </section>`,s);
+    }
     if (p==="/dashboard"||p==="/admin"||p==="/admin/") {
       const [media,enquiries,acks]=await Promise.all([get(env.DB,"media"),get(env.DB,"enquiries"),get(env.DB,"acknowledgements")]);
       const cards=[
