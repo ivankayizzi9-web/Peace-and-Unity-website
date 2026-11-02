@@ -356,8 +356,12 @@ async function handle(req,env) {
       </div>`).join(""):'<p class="muted">No enquiries received yet.</p>';
       return shell("Enquiries",`<section class="card"><h1>Visitor Enquiries (${items.length})</h1>${list}</section>`,s);
     }
-    return new Response("Page not found.", {status:404});
+       return new Response("Page not found.", {status:404});
   }
+
+  if (p==="/"&&m==="GET") return redirect("/login");
+
+  return new Response("Page not found.", {status:404});
 }
 
 export default {
