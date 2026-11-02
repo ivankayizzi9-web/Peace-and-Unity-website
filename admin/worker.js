@@ -268,6 +268,47 @@ async function handle(req,env) {
         </form>
       </section>`,s);
     }
+    if (p==="/admin/media"&&m==="GET") {
+      const items=await get(env.DB,"media");
+      const list=items.length?items.map(x=>`<div class="item">
+        <div class="row">
+          <strong>${htmlEscape(x.title||"Untitled")}</strong>
+          <span class="muted small">${htmlEscape(x.type||"image")}</span>
+        </div>
+        <p>${htmlEscape(x.description||"")}</p>
+        <p><a href="${htmlEscape(x.url||"")}" target="_blank" rel="noopener">View media</a></p>
+        <form method="post" action="/admin/media/delete">
+          <input type="hidden" name="csrf" value="${htmlEscape(s.csrf)}">
+          <input type="hidden" name="id" value="${htmlEscape(x.id)}">
+          <button class="danger" type="submit">Delete</button>
+        </form>
+      </div>`).join(""):'<p class="muted">No media items added yet.</p>';
+      return shell("Media Manager",`<section class="card">
+        <h1>Media Manager</h1>
+        <p class="muted">Manage images, videos, stories and foundation updates.</p>
+        ${saved}
+        <form method="post" action="/admin/media">
+          <input type="hidden" name="csrf" value="${htmlEscape(s.csrf)}">
+          <label>Media Type</label>
+          <select name="type">
+            <option value="image">Image</option>
+            <option value="video">Video</option>
+            <option value="story">Story</option>
+            <option value="project">Project</option>
+            <option value="news">News</option>
+          </select>
+          <label>Title</label>
+          <input name="title" required>
+          <label>Description</label>
+          <textarea name="description" rows="4"></textarea>
+          <label>Media URL</label>
+          <input type="url" name="url" required>
+          <button type="submit">Add Media</button>
+        </form>
+        <h2>Existing Media (${items.length})</h2>
+        ${list}
+      </section>`,s);
+    }
         if (p==="/admin/donations"&&m==="GET") {
       const d=await get(env.DB,"donations")||{};
       return shell("Donations",`<section class="card">
