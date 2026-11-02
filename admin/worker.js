@@ -137,25 +137,23 @@ async function handle(req,env) {
     const out={}; for (const k of ["homepage","story","contact","donations","media"]) out[k]=await get(env.DB,k);
     return json(out);
   }
-  if (p==="/api/enquiries"&&m==="POST") {
-    const ip=req.headers.get("CF-Connecting-IP")||"unknown";
-    if (!await limit(env.DB,"enquiry:"+ip,5)) return json({error:"Too many messages. Please try again later."},429);
-    const b=await req.json().catch(()=>({}));
-    if (String(b.website||"").trim()) return json({error:"Unable to send message."},400);
-    const name=String(b.name||"").trim().slice(0,100),email=String(b.email||"").trim().slice(0,160),message=String(b.message||"").trim().slice(0,2000);
-    if (!name||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)||!message) return json({error:"Please provide a name, valid email and message."},400);
-    const a=await get(env.DB,"enquiries"); a.unshift({id:crypto.randomUUID(),name,email,message,createdAt:new Date().toISOString(),status:"new"});
-    await put(env.DB,"enquiries",a.slice(0,200)); return json({ok:true},201);
-  }
-  if (p==="/api/acknowledgements"&&m==="POST") {
-    const ip=req.headers.get("CF-Connecting-IP")||"unknown";
-    if (!await limit(env.DB,"ack:"+ip,10)) return json({error:"Too many requests. Please try again later."},429);
-    const b=await req.json().catch(()=>({}));
-    if (b.acknowledged!==true) return json({error:"Acknowledgement is required."},400);
-    const a=await get(env.DB,"acknowledgements"); a.unshift({id:crypto.randomUUID(),acknowledgedAt:new Date().toISOString(),source:"website"});
-    await put(env.DB,"acknowledgements",a.slice(0,500)); return json({ok:true},201);
-  }
-
+      if (p==="/admin/acknowledgements"&&m==="GET") {
+      const items=await get(env.DB,"acknowledgements");
+      const list=items.length?items.map(x=>`<div class="item">
+        <div class="row">
+          <strong>Visitor acknowledgement</strong>
+          <span class="muted small">${htmlEscape(x.acknowledgedAt||"")}</span>
+        </div>
+        <p>Status: Acknowledgement received</p>
+        <p>Source: ${htmlEscape(x.source||"website")}</p>
+        <p class="muted small">Record ID: ${htmlEscape(x.id||"")}</p>
+      </div>`).join(""):'<p class="muted">No acknowledgements recorded yet.</p>';
+      return shell("Acknowledgements",`<section class="card">
+        <h1>Terms &amp; Privacy Acknowledgements (${items.length})</h1>
+        <p class="muted">Records of visitors who confirmed their acknowledgement of the foundation's Terms and Privacy Policy.</p>
+        ${list}
+      </section>`,s);
+    }
   if (p==="/login"&&m==="GET") {
     const s=await session(req,env); if (s) return redirect("/dashboard");
     return page("Admin Login",`<main class="wrap login"><section class="card"><div class="brand">🌱</div><h1>Admin login</h1><p class="muted">Private management area for Brighter Future Foundation.</p>${u.searchParams.has("error")?'<p class="notice warning">Login details could not be verified.</p>':""}${u.searchParams.has("changed")?'<p class="notice">Your password has been changed. Please sign in.</p>':""}<form method="post" action="/login"><label>Email</label><input name="email" type="email" autocomplete="username" required><label>Password</label><input name="password" type="password" autocomplete="current-password" required><button type="submit">Sign in</button></form><p><a href="/forgot-password">Forgot password?</a></p></section></main>`);
@@ -396,6 +394,23 @@ async function handle(req,env) {
         </form>
       </div>`).join(""):'<p class="muted">No enquiries received yet.</p>';
       return shell("Enquiries",`<section class="card"><h1>Visitor Enquiries (${items.length})</h1>${list}</section>`,s);
+    }
+            if (p==="/admin/acknowledgements"&&m==="GET") {
+      const items=await get(env.DB,"acknowledgements");
+      const list=items.length?items.map(x=>`<div class="item">
+        <div class="row">
+          <strong>Visitor acknowledgement</strong>
+          <span class="muted small">${htmlEscape(x.acknowledgedAt||"")}</span>
+        </div>
+        <p>Status: Acknowledgement received</p>
+        <p>Source: ${htmlEscape(x.source||"website")}</p>
+        <p class="muted small">Record ID: ${htmlEscape(x.id||"")}</p>
+      </div>`).join(""):'<p class="muted">No acknowledgements recorded yet.</p>';
+      return shell("Acknowledgements",`<section class="card">
+        <h1>Terms &amp; Privacy Acknowledgements (${items.length})</h1>
+        <p class="muted">Records of visitors who confirmed their acknowledgement of the foundation's Terms and Privacy Policy.</p>
+        ${list}
+      </section>`,s);
     }
        return new Response("Page not found.", {status:404});
   }
