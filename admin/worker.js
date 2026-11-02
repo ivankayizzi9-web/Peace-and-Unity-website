@@ -133,6 +133,58 @@ async function handle(req,env) {
   await init(env.DB);
   const u=new URL(req.url),p=u.pathname,m=req.method;
   if (p==="/health"&&m==="GET") return json({ok:true,service:"Brighter Future Admin",database:true});
+    if (p==="/api/acknowledgements"&&m==="OPTIONS") {
+    return new Response(null,{
+      status:204,
+      headers:{
+        "Access-Control-Allow-Origin":"https://peace-and-unity-website.pages.dev",
+        "Access-Control-Allow-Methods":"POST, OPTIONS",
+        "Access-Control-Allow-Headers":"Content-Type",
+        "Access-Control-Max-Age":"86400"
+      }
+    });
+  }
+
+  if (p==="/api/acknowledgements"&&m==="POST") {
+    const origin=req.headers.get("Origin");
+  if (origin!=="https://peace-and-unity-website.pages.dev") {
+  return json({error:"Invalid request origin."},403,{
+    "Access-Control-Allow-Origin":"https://peace-and-unity-website.pages.dev"
+  });
+}
+
+    const data=await req.json();
+    if (data.acknowledged!==true) {
+  return json({error:"Please confirm the Terms and Privacy Policy."},400,{
+    "Access-Control-Allow-Origin":"https://peace-and-unity-website.pages.dev"
+  });
+}
+    const name=String(data.name||"").trim().slice(0,120);
+    const email=String(data.email||"").trim().slice(0,160);
+
+   if (email&&!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+  return json({error:"Please enter a valid email address."},400,{
+    "Access-Control-Allow-Origin":"https://peace-and-unity-website.pages.dev"
+  });
+}
+
+    const items=await get(env.DB,"acknowledgements");
+    const record={
+      id:crypto.randomUUID(),
+      acknowledgedAt:new Date().toISOString(),
+      source:"website",
+      name,
+      email
+    };
+
+    items.unshift(record);
+    await put(env.DB,"acknowledgements",items.slice(0,500));
+
+    return json({ok:true,id:record.id},200,{
+  "Access-Control-Allow-Origin":"https://peace-and-unity-website.pages.dev",
+  "Cache-Control":"no-store"
+});
+      }
   if (p==="/api/content"&&m==="GET") {
     const out={}; for (const k of ["homepage","story","contact","donations","media"]) out[k]=await get(env.DB,k);
     return json(out);
@@ -386,6 +438,8 @@ async function handle(req,env) {
           <span class="muted small">${htmlEscape(x.acknowledgedAt||"")}</span>
         </div>
         <p>Status: Acknowledgement received</p>
+        <p>Name: ${htmlEscape(x.name||"Not provided")}</p>
+<p>Email: ${htmlEscape(x.email||"Not provided")}</p>
         <p>Source: ${htmlEscape(x.source||"website")}</p>
         <p class="muted small">Record ID: ${htmlEscape(x.id||"")}</p>
       </div>`).join(""):'<p class="muted">No acknowledgements recorded yet.</p>';
