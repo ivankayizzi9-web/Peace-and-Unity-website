@@ -1028,6 +1028,31 @@ opacity:.8;
 
 <div class="terms-agreement">
   <label class="terms-check">
+    ```html
+<div class="terms-acknowledgement">
+  <label for="acknowledgementName">Full Name (optional)</label>
+  <input
+    type="text"
+    id="acknowledgementName"
+    name="name"
+    placeholder="Enter your full name"
+    autocomplete="name"
+  >
+
+  <label for="acknowledgementEmail">Email Address (optional)</label>
+  <input
+    type="email"
+    id="acknowledgementEmail"
+    name="email"
+    placeholder="Enter your email address"
+    autocomplete="email"
+  >
+
+  <p class="terms-privacy-note">
+    Your details will be used to maintain acknowledgement records.
+  </p>
+
+  <label>
     <input type="checkbox" id="termsAcknowledgement">
     <span>
       I acknowledge that I have read and agree to the
@@ -1035,8 +1060,11 @@ opacity:.8;
       <a href="#privacy">Privacy Policy</a>.
     </span>
   </label>
-  <span id="terms-status" class="terms-status" role="status" aria-live="polite"></span>
+
+  <span id="terms-status" class="terms-status"
+        role="status" aria-live="polite"></span>
 </div>
+```
 
   <footer class="footer">
   <div class="wrap footer-inner">
@@ -1244,10 +1272,10 @@ if(termsAcknowledgement){
     termsAcknowledgement.disabled=true;
     if(termsStatus) termsStatus.textContent="Recording...";
     try{
-      const response=await fetch("https://peace-and-unity-admin.onrender.com/api/acknowledgements",{
+      const response=await fetch("https://brighter-future-admin.ivankayizzi9.workers.dev/api/acknowledgements",{
         method:"POST",
         headers:{"Content-Type":"application/json","Accept":"application/json"},
-        body:JSON.stringify({acknowledged:true})
+        body:JSON.stringify({   acknowledged:true,   name:document.getElementById("acknowledgementName")?.value.trim()||"",   email:document.getElementById("acknowledgementEmail")?.value.trim()||"" })
       });
       const result=await response.json().catch(()=>({}));
       if(!response.ok) throw new Error(result.error||"Unable to record acknowledgement.");
