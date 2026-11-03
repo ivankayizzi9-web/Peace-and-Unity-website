@@ -435,7 +435,7 @@ async function handle(req,env) {
       const list=items.length?items.map(x=>`<div class="item">
         <div class="row">
           <strong>Visitor acknowledgement</strong>
-          <span class="muted small">${htmlEscape(x.acknowledgedAt||"")}</span>
+          <span class="muted small">${htmlEscape(x.acknowledgedAt ? new Date(x.acknowledgedAt).toLocaleString("en-UG", { timeZone: "Africa/Kampala" }) : "")}</span>
         </div>
         <p>Status: Acknowledgement received</p>
         <p>Name: ${htmlEscape(x.name||"Not provided")}</p>
