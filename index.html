@@ -497,10 +497,40 @@ opacity:.8;
   outline: 3px solid #e5b84b;
   outline-offset: 3px;
 }
+  /* Airtel red payment buttons */
+.airtel-actions .button {
+  background: #E60000;
+  color: #ffffff;
+  border-color: #E60000;
+}
+
+.airtel-actions .button:hover {
+  background: #B80000;
+}
   /* Airtel brand colours */
 .airtel-brand {
   color: #E60000 !important;
   font-weight: 800;
+}
+  /* MTN brand colours */
+.mtn-brand {
+  display: inline-block;
+  color: #111111 !important;
+  background: #FFCC00;
+  padding: 4px 9px;
+  border-radius: 5px;
+  font-weight: 800;
+}
+
+/* MTN yellow payment buttons */
+.mtn-actions .button {
+  background: #FFCC00;
+  color: #111111;
+  border-color: #E0AD00;
+}
+
+.mtn-actions .button:hover {
+  background: #E6B800;
 }
 </style>
 </head>
@@ -997,7 +1027,7 @@ opacity:.8;
 <p>Send your contribution directly through Airtel Money using the details below.</p>
  <div class="support-detail">   <span>Phone number</span>   <strong>+256 742 119 378</strong>   <button type="button" class="copy-detail" data-copy="+256742119378">Copy</button> </div>
 <div class="support-detail"><span>Account name</span><strong>Ivan Kayizzi</strong></div>
-<div class="payment-actions">
+<div class="payment-actions airtel-actions">
   <a class="button" href="tel:*185%23">Open Airtel Money Menu</a>
   <a class="button" href="https://www.airtel.co.ug/" target="_blank" rel="noopener">Airtel Website / App</a>
 </div>
@@ -1012,7 +1042,7 @@ opacity:.8;
 
 
   <div class="support-content">
-    <span class="support-label">MTN Mobile Money</span>
+    <span class="support-label mtn-brand">MTN Mobile Money</span>
     <h4>Give by mobile money</h4>
     <p>Send your contribution directly through MTN Mobile Money using the details below.</p>
     <div class="support-detail">
@@ -1023,7 +1053,7 @@ opacity:.8;
       <span>Account name</span>
       <strong>Ivan Kayizzi</strong>
        </div>
-    <div class="payment-actions">
+    <div class="payment-actions mtn-actions">
       <a class="button" href="tel:*165%23">Open MTN Mobile Money Menu</a>
       <a class="button" href="https://www.mtn.co.ug/" target="_blank" rel="noopener">Visit MTN Website</a>
     </div>
