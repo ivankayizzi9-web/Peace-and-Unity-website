@@ -465,7 +465,38 @@ opacity:.8;
   letter-spacing: -1px;
   line-height: 1;
 }
+/* Donation payment buttons */
+.payment-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 15px;
+}
 
+.payment-actions .button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1 1 180px;
+  min-height: 44px;
+  padding: 11px 18px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 700;
+  text-align: center;
+  text-decoration: none;
+  transition: background 0.25s ease, transform 0.25s ease;
+}
+
+.payment-actions .button:hover {
+  transform: translateY(-2px);
+  background: #155b45;
+}
+
+.payment-actions .button:focus-visible {
+  outline: 3px solid #e5b84b;
+  outline-offset: 3px;
+}
 </style>
 </head>
 <body>
