@@ -507,6 +507,19 @@ opacity:.8;
 .airtel-actions .button:hover {
   background: #B80000;
 }
+  /* Horizontal layout for donation payment cards */
+.support-methods {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 20px;
+  align-items: stretch;
+}
+
+@media (max-width: 768px) {
+  .support-methods {
+    grid-template-columns: 1fr;
+  }
+}
   /* Airtel brand colours */
 .airtel-brand {
   display: inline-block;
@@ -1026,7 +1039,7 @@ opacity:.8;
 
 
 <div class="support-icon-feature"><div class="support-feature-icon spread-feature" aria-hidden="true"><svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="21" fill="#fff"/><path d="M8 18h10l15-9v30l-15-9H8z" fill="#1687d9"/><path d="M37 16c5 4 5 12 0 16" fill="none" stroke="#f7c948" stroke-width="3" stroke-linecap="round"/><path d="M41 12c9 7 9 17 0 24" fill="none" stroke="#f28c28" stroke-width="3" stroke-linecap="round"/></svg></div><strong>Spread</strong><span>Hope &amp; kindness</span></div>
-</div>
+</div> <div class="support-methods">
 <div class="support-method">
 <div class="support-icon airtel-icon" aria-label="Airtel Money" title="Airtel Money"><img src="assets/airtel-logo.svg" alt="Airtel Money logo"></div>
 <div class="support-content">
@@ -1077,6 +1090,7 @@ opacity:.8;
 <div class="support-detail"><span>Account name</span><strong>Ivan Kayizzi</strong></div>
 <div class="support-detail">   <span>Account number</span>   <strong>1003101355426</strong>   <button type="button" class="copy-detail" data-copy="1003101355426">Copy account number</button> </div>
 <div class="support-detail"><span>Currency</span><strong>UGX</strong></div>
+</div>
 </div>
 </div>
 <div class="support-note"><strong>Thank you for standing with Brighter Future Foundation.</strong><br>Before sending your contribution, please verify the payment details and account name. After making a contribution, keep your transaction confirmation for your records. Your generosity helps us work toward a more peaceful and supportive community.</div>
