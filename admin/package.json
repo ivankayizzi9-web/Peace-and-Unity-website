@@ -1,12 +1,18 @@
+
 {
   "name": "brighter-future-admin",
   "private": true,
   "version": "1.0.0",
-  "description": "Brighter Future Foundation Cloudflare admin worker",
+  "description": "Brighter Future Foundation Admin",
   "scripts": {
-    "deploy": "wrangler deploy"
+    "start": "node server.js"
   },
-  "devDependencies": {
-    "wrangler": "^4.0.0"
+  "dependencies": {
+    "bcryptjs": "^3.0.2",
+    "connect-pg-simple": "^10.0.0",
+    "express": "^5.1.0",
+    "express-session": "^1.18.2",
+    "helmet": "^8.1.0",
+    "pg": "^8.16.0"
   }
 }
