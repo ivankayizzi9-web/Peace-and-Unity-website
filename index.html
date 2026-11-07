@@ -947,11 +947,11 @@ opacity:.8;
     <div class="media-filters" aria-label="Filter community content"><button type="button" class="media-filter active" data-filter="all">All</button><button type="button" class="media-filter" data-filter="image">Pictures</button><button type="button" class="media-filter" data-filter="video">Videos</button><button type="button" class="media-filter" data-filter="story">Stories</button><button type="button" class="media-filter" data-filter="project">Projects</button><button type="button" class="media-filter" data-filter="news">News</button></div>
 
     <div class="media-grid">
-      <article class="media-card">
+      <article class="media-card" data-category="image">
         <div class="media-visual">  <img     src="assets/Growing%20Together%2C%20Brighter%20Futures.png"     alt="Brighter Future Foundation supporting children and families"     loading="lazy"   > </div>
         <div class="media-body"><h3>Community moments</h3><p>Photos from Brighter Future Foundation activities, community visits, and moments of togetherness.</p><a class="media-link" href="#media">View pictures →</a></div>
       </article>
-      <article class="media-card">
+     <article class="media-card" data-category="video">
          <div class="media-visual video">   <span class="media-type">Videos</span>   <div class="video-placeholder">     <span class="video-icon">▶</span>     <p>Stories of hope, kindness &amp; change</p>     <small>Brighter Future Foundation</small>   </div>   <button class="media-play" type="button" aria-label="Video coming soon">▶</button> </div>
         <div class="media-body"><h3>Watch &amp; listen</h3><p>Videos and short messages from community members, volunteers, and Brighter Future Foundation activities.</p><a class="media-link" href="#media">Watch videos →</a></div>
       </article>
@@ -1220,6 +1220,43 @@ document.querySelectorAll('.copy-detail').forEach(button=>button.addEventListene
     button.textContent='Copy manually';
   }
 }));
+  // Media category filters
+const mediaFilters = document.querySelectorAll('.media-filter');
+const mediaCards = document.querySelectorAll('.media-card');
+const mediaGrid = document.querySelector('.media-grid');
+
+mediaFilters.forEach(button => {
+  button.addEventListener('click', () => {
+    const filter = button.dataset.filter;
+    let visibleCount = 0;
+
+    mediaFilters.forEach(item => item.classList.remove('active'));
+    button.classList.add('active');
+
+    mediaCards.forEach(card => {
+      const category = card.dataset.category;
+      const show = filter === 'all' || category === filter;
+
+      card.style.display = show ? '' : 'none';
+
+      if (show) visibleCount++;
+    });
+
+    let emptyMessage = mediaGrid.querySelector('.media-empty');
+
+    if (!emptyMessage) {
+      emptyMessage = document.createElement('div');
+      emptyMessage.className = 'media-empty';
+      mediaGrid.appendChild(emptyMessage);
+    }
+
+    emptyMessage.textContent = visibleCount === 0
+      ? 'No content available in this category yet. Please check back soon.'
+      : '';
+
+    emptyMessage.style.display = visibleCount === 0 ? 'block' : 'none';
+  });
+});
 </script>
 
   <script>
