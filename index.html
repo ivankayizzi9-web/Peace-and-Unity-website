@@ -574,6 +574,20 @@ opacity:.8;
   font-size: 18px;
   font-weight: 800;
 }
+  /* Show the complete Community Moments picture */
+.media-visual:not(.video){
+  height:auto;
+  min-height:0;
+  background:var(--paper);
+}
+
+.media-visual:not(.video) img{
+  width:100%;
+  height:auto;
+  display:block;
+  object-fit:contain;
+  object-position:center;
+}
 </style>
 </head>
 <body>
