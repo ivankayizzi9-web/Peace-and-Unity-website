@@ -103,7 +103,7 @@
 
 .media{background:var(--cream);padding:88px 0}
 .media-filters{   display:flex;   flex-wrap:wrap;   gap:10px;   margin:0 0 18px; }  .media-filter{   border:1px solid var(--green);   background:var(--green);   color:#fff;   padding:11px 20px;   border-radius:50px;   font-size:12px;   font-weight:800;   cursor:pointer;   transition:all .2s ease; }  .media-filter:hover, .media-filter.active{   background:#fff;   color:var(--green);   border-color:var(--green); }
-.media-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.media-grid{   display:grid;   grid-template-columns:repeat(2,minmax(0,1fr));   gap:22px; }
 .media-card{background:var(--paper);border:1px solid var(--line);border-radius:18px;overflow:hidden;transition:.2s}
 .media-card:hover{transform:translateY(-3px);border-color:#9eae9f}
 .media-visual{height:205px;position:relative;display:flex;align-items:center;justify-content:center;background:linear-gradient(145deg,#d8e2c0,#7f9b78);font-size:48px}
