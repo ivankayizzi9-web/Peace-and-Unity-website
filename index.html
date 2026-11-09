@@ -630,6 +630,26 @@ opacity:.8;
 .donation-notice p{
   margin:0;
 }
+  .story-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 14px 22px;
+  border: 1px solid var(--green);
+  border-radius: 999px;
+  color: var(--green);
+  background: transparent;
+  font-size: 14px;
+  font-weight: 700;
+  text-decoration: none;
+  transition: .2s ease;
+}
+
+.story-button:hover {
+  background: var(--green);
+  color: white;
+  transform: translateY(-2px);
+}
 </style>
 </head>
 <body>
@@ -662,7 +682,10 @@ opacity:.8;
 
 
 <section class="wrap hero"><div><div class="eyebrow">Supporting Children. Empowering Families.</div><h1>Building a Brighter Future for Every Child.</h1>
- <p class="hero-copy">Brighter Future Foundation is dedicated to supporting vulnerable children, promoting access to education, and helping families experiencing poverty. Through compassion, practical assistance, and community support, we aim to create opportunities, restore dignity, and build brighter futures.</p><div class="hero-actions"><a class="button" href="#give">Support our mission <span>↗</span></a><a class="text-link" href="#story">Discover our story <span>→</span></a></div><div class="trust"><div class="avatars"><span class="avatar">M</span><span class="avatar">A</span><span class="avatar">J</span><span class="avatar">+</span></div><span><strong>Growing together</strong><br>supporting children and families</span></div></div>
+ <p class="hero-copy">Brighter Future Foundation is dedicated to supporting vulnerable children, promoting access to education, and helping families experiencing poverty. Through compassion, practical assistance, and community support, we aim to create opportunities, restore dignity, and build brighter futures.</p><div class="hero-actions">
+  <a class="button" href="#give">Support our mission</a>
+  <a class="story-button" href="#story">Discover our story</a>
+</div><div class="trust"><div class="avatars"><span class="avatar">M</span><span class="avatar">A</span><span class="avatar">J</span><span class="avatar">+</span></div><span><strong>Growing together</strong><br>supporting children and families</span></div></div>
 
 <div class="photo-card" style="padding:0; overflow:hidden; min-height:0;">
   <img
