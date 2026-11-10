@@ -78,7 +78,17 @@
   display:grid;
   place-items:center;
 }
-.support-feature-icon svg{width:28px;height:28px}.support-icon-feature strong {
+.support-feature-icon svg{width:28px;height:28px}
+
+.support-feature-icon img{
+  width:48px;
+  height:38px;
+  object-fit:cover;
+  border-radius:6px;
+  display:block;
+}
+
+.support-icon-feature strong {
   font-size: 15px;
   color: #000000;
   font-weight: 900;
@@ -1118,15 +1128,7 @@ opacity:.8;
 
 <div class="support-icon-feature">
   <div class="support-feature-icon unity-feature" aria-hidden="true">
-    <svg viewBox="0 0 48 48">
-      <path d="M24 7a17 17 0 0 1 14.7 8.5l-8.1 4.7A8 8 0 0 0 24 16z" fill="#1687d9"/>
-      <path d="M38.7 15.5A17 17 0 0 1 38.7 32l-8.1-4.7A8 8 0 0 0 32 24z" fill="#f28c28"/>
-      <path d="M38.7 32A17 17 0 0 1 24 41v-9a8 8 0 0 0 6.6-3.7z" fill="#2e9b4f"/>
-      <path d="M24 41A17 17 0 0 1 9.3 32l8.1-4.7A8 8 0 0 0 24 32z" fill="#f2c94c"/>
-      <path d="M9.3 32A17 17 0 0 1 9.3 15.5l8.1 4.7A8 8 0 0 0 16 24z" fill="#d63b45"/>
-      <path d="M9.3 15.5A17 17 0 0 1 24 7v9a8 8 0 0 0-6.6 3.7z" fill="#6b5fc7"/>
-      <circle cx="24" cy="24" r="6" fill="#fff"/>
-    </svg>
+    <img src="assets/unity-handshake.png" alt="Two people shaking hands to represent unity">
   </div>
   <strong>Unity</strong>
   <span>Stronger together</span>
