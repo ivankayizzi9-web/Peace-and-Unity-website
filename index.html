@@ -752,10 +752,6 @@ opacity:.8;
 }
 
 @media (max-width: 800px) {
-  .header-inner {
-    flex-direction: row;
-  }
-
   header.nav {
     display: flex;
     flex-direction: row;
@@ -764,6 +760,7 @@ opacity:.8;
     flex-wrap: wrap;
     gap: 10px;
     padding: 10px 0;
+    position: relative;
   }
 
   .brand {
@@ -784,8 +781,9 @@ opacity:.8;
     margin: 0;
   }
 
- .nav-links {
+  .nav-links {
     display: none;
+    flex: 0 0 100%;
     flex-direction: column;
     align-items: flex-start;
     justify-content: flex-start;
@@ -794,11 +792,8 @@ opacity:.8;
     padding: 15px 20px;
     margin: 0;
     text-align: left;
-}
-
-.nav-links.open {
-    display: flex;
-}
+    background: #ffffff;
+  }
 
   .nav-links.open {
     display: flex;
