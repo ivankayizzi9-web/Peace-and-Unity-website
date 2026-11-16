@@ -738,6 +738,39 @@ opacity:.8;
   background: #1687d9;
   color: #ffffff;
 }
+  
+/* Mobile navigation menu */
+.menu-toggle {
+  display: none;
+  background: #18352b;
+  color: #ffffff;
+  border: none;
+  border-radius: 10px;
+  padding: 10px 16px;
+  font-size: 25px;
+  cursor: pointer;
+}
+
+@media (max-width: 800px) {
+  .menu-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .nav-links {
+    display: none;
+    flex-direction: column;
+    width: 100%;
+    gap: 14px;
+    padding: 15px 0;
+  }
+
+  .nav-links.open {
+    display: flex;
+  }
+}
+
 </style>
 </head>
 <body>
@@ -755,6 +788,11 @@ opacity:.8;
       <strong style="font-size:15px; letter-spacing:3px; color:#23823b;">FOUNDATION</strong>
     </span>
   </a>
+  <button class="menu-toggle" type="button"
+  aria-label="Open navigation menu"
+  aria-expanded="false">
+  ☰
+</button>
   <nav class="nav-links">
     <a href="#mission">Mission</a>
     <a href="#impact">Impact</a>
