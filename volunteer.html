@@ -342,6 +342,18 @@
   accent-color: #1687d9;
 }
 
+/* Volunteer opportunities layout */
+.opportunities-section .volunteer-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  padding-bottom: 40px;
+}
+
+@media (max-width: 800px) {
+  .opportunities-section .volunteer-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
   </style>
 </head>
 
@@ -428,6 +440,54 @@
       </div>
     </div>
   </section>
+
+<section class="opportunities-section">
+  <div class="wrap">
+    <div class="eyebrow">Ways to contribute</div>
+    <h2 style="text-align:center;color:#18352b;">
+      Volunteer Opportunities
+    </h2>
+    <p style="text-align:center;">
+      There are different ways to share your time, skills and compassion.
+    </p>
+
+    <div class="volunteer-grid">
+
+      <article class="volunteer-card">
+        <h2>Education Support</h2>
+        <p>
+          Help promote learning opportunities and encourage children
+          in their educational journey.
+        </p>
+      </article>
+
+      <article class="volunteer-card">
+        <h2>Family Support</h2>
+        <p>
+          Help identify practical ways to support families experiencing
+          difficult circumstances.
+        </p>
+      </article>
+
+      <article class="volunteer-card">
+        <h2>Community Outreach</h2>
+        <p>
+          Participate in community activities, visits and initiatives
+          that encourage unity and compassion.
+        </p>
+      </article>
+
+      <article class="volunteer-card">
+        <h2>Skills & Partnerships</h2>
+        <p>
+          Share professional knowledge, experience and connections
+          that may help strengthen our work.
+        </p>
+      </article>
+
+    </div>
+  </div>
+</section>
 
 <section class="volunteer-form-section">
   <div class="wrap">
