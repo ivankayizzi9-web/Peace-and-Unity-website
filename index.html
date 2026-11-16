@@ -798,21 +798,40 @@ header.nav .brand strong:last-child {
     letter-spacing: 2px !important;
 }
 
-  header.nav .nav-links {
+ header.nav .nav-links {
   display: none;
   position: absolute;
- top: 145px;
+  top: 145px;
   left: 10px;
-  width: 220px;
+  width: 230px;
   max-width: calc(100vw - 30px);
-  padding: 16px;
+  padding: 14px;
   background: #ffffff;
-  border-radius: 12px;
-  box-shadow: 0 5px 20px rgba(0,0,0,0.18);
+  border: 1px solid #e5eadf;
+  border-radius: 16px;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.16);
   flex-direction: column;
-  align-items: flex-start;
-  gap: 16px;
+  align-items: stretch;
+  gap: 5px;
   z-index: 1001;
+}
+
+header.nav .nav-links a {
+  display: block;
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: 10px;
+  color: #18352b;
+  font-size: 15px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+header.nav .nav-links a:hover,
+header.nav .nav-links a:focus {
+  background: #edf4e8;
+  color: #15529a;
 }
 
 header.nav .nav-links.open {
