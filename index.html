@@ -813,18 +813,27 @@ opacity:.8;
 
 
 <header class="wrap nav">
-  <a class="brand" href="#top" aria-label="Brighter Future Foundation home" style="display:flex; align-items:center; gap:10px; text-decoration:none; min-width:0;">
-     <img src="assets/brighter-future-foundation-symbol.png" alt="Brighter Future Foundation logo" style="width:140px; height:140px; object-fit:contain; flex-shrink:0;">
-    <span style="display:flex; flex-direction:column; line-height:1.15;">
+
+  <button class="menu-toggle" type="button"
+    aria-label="Open navigation menu"
+    aria-expanded="false">
+    ☰
+  </button>
+
+  <a class="brand" href="#top"
+     aria-label="Brighter Future Foundation home"
+     style="display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px; text-decoration:none;">
+
+    <img src="assets/brighter-future-foundation-symbol.png"
+         alt="Brighter Future Foundation logo"
+         style="width:85px; height:85px; object-fit:contain;">
+
+    <span style="display:flex; flex-direction:column; align-items:center; line-height:1.15;">
       <strong style="font-size:20px; color:#15529a;">BRIGHTER FUTURE</strong>
       <strong style="font-size:15px; letter-spacing:3px; color:#23823b;">FOUNDATION</strong>
     </span>
   </a>
-  <button class="menu-toggle" type="button"
-  aria-label="Open navigation menu"
-  aria-expanded="false">
-  ☰
-</button>
+
   <nav class="nav-links">
     <a href="#mission">Mission</a>
     <a href="#impact">Impact</a>
@@ -834,7 +843,9 @@ opacity:.8;
     <a href="#faq">FAQ</a>
     <a href="#contact">Contact</a>
   </nav>
+
   <a class="nav-cta" href="#give">Make a gift</a>
+
 </header>
 
 
