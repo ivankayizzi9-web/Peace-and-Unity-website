@@ -304,6 +304,44 @@
   color: #ffffff;
 }
 
+/* Volunteer privacy and consent */
+.volunteer-consent {
+  background: #eef6fb;
+  border: 1px solid #d7e8f3;
+  border-radius: 12px;
+  padding: 18px;
+  margin-top: 22px;
+}
+
+.volunteer-consent p {
+  color: #52645c;
+  font-size: 14px;
+  margin: 6px 0 12px;
+}
+
+.volunteer-consent strong {
+  color: #18352b;
+  font-size: 16px;
+}
+
+.volunteer-consent label {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: 14px;
+  color: #18352b;
+  line-height: 1.6;
+  margin: 12px 0 0;
+}
+
+.volunteer-consent input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  margin-top: 3px;
+  accent-color: #1687d9;
+}
+
   </style>
 </head>
 
@@ -431,6 +469,21 @@
 
       <label for="vol-message">Why would you like to volunteer?</label>
       <textarea id="vol-message" required placeholder="Tell us why you would like to join us"></textarea>
+
+<div class="volunteer-consent">
+  <p><strong>Privacy and Consent</strong></p>
+  <p>
+    Your information will be used by Brighter Future Foundation
+    to review your application and contact you about volunteering
+    opportunities.
+  </p>
+
+  <label for="vol-consent">
+    <input type="checkbox" id="vol-consent" required>
+    I agree to have my information used for processing my
+    volunteer application.
+  </label>
+</div>
 
       <button type="submit" class="button">
         Submit Volunteer Application
