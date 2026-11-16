@@ -489,6 +489,14 @@
         Submit Volunteer Application
       </button>
 
+<p id="vol-submit-status" role="status" aria-live="polite"
+   style="display:none; color:#18352b; background:#eef6fb;
+   padding:15px; border-radius:10px; margin-top:15px;">
+  Thank you for your interest in Brighter Future Foundation!
+  Your email application is being prepared. Please press Send
+  in your email app to complete your application.
+</p>
+
       <p style="font-size:13px;color:#68736e;">
         Submitting opens your email application with your details prepared.
         You will need to send the email to complete your application.
@@ -528,6 +536,16 @@
 <script>
 function sendVolunteerEmail(event) {
   event.preventDefault();
+
+  const status = document.getElementById("vol-submit-status");
+
+  if (status) {
+    status.style.display = "block";
+    status.scrollIntoView({
+      behavior: "smooth",
+      block: "center"
+    });
+  }
 
   const fields = [
     ["Full Name", "vol-name"],
