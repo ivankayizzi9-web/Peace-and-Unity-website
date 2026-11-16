@@ -752,19 +752,29 @@ opacity:.8;
 }
 
 @media (max-width: 800px) {
+  .header-inner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    padding: 15px 0;
+  }
+
   .menu-toggle {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  margin: 10px auto;
-  position: relative;
-  z-index: 10;
-}
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin: 5px auto;
+    position: relative;
+    z-index: 10;
+  }
 
   .nav-links {
     display: none;
     flex-direction: column;
+    align-items: center;
     width: 100%;
     gap: 14px;
     padding: 15px 0;
@@ -774,7 +784,6 @@ opacity:.8;
     display: flex;
   }
 }
-
 </style>
 </head>
 <body>
