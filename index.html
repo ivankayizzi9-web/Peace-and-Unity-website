@@ -753,12 +753,27 @@ opacity:.8;
 
 @media (max-width: 800px) {
   .header-inner {
+    flex-direction: row;
+  }
+
+  header.nav {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     align-items: center;
-    justify-content: center;
-    gap: 12px;
-    padding: 15px 0;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 10px 0;
+  }
+
+  .brand {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .brand img {
+    width: 65px !important;
+    height: 65px !important;
   }
 
   .menu-toggle {
@@ -766,9 +781,7 @@ opacity:.8;
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
-    margin: 5px auto;
-    position: relative;
-    z-index: 10;
+    margin: 0;
   }
 
   .nav-links {
@@ -782,6 +795,10 @@ opacity:.8;
 
   .nav-links.open {
     display: flex;
+  }
+
+  .nav-cta {
+    display: none;
   }
 }
 </style>
