@@ -218,6 +218,51 @@
         padding:30px;
       }
     }
+    
+/* Volunteer application form */
+.volunteer-form-section {
+  padding: 60px 0;
+  background: #ffffff;
+}
+
+.volunteer-form {
+  max-width: 700px;
+  margin: 30px auto 0;
+  padding: 30px;
+  background: #f7f3ec;
+  border-radius: 16px;
+  border: 1px solid #ded8ce;
+}
+
+.volunteer-form label {
+  display: block;
+  margin: 15px 0 6px;
+  font-weight: bold;
+  color: #18352b;
+}
+
+.volunteer-form input,
+.volunteer-form select,
+.volunteer-form textarea {
+  width: 100%;
+  padding: 13px;
+  border: 1px solid #ded8ce;
+  border-radius: 8px;
+  font-size: 15px;
+  font-family: Arial, sans-serif;
+}
+
+.volunteer-form textarea {
+  min-height: 120px;
+  resize: vertical;
+}
+
+.volunteer-form button {
+  border: 0;
+  cursor: pointer;
+  margin-top: 20px;
+}
+
   </style>
 </head>
 
@@ -306,6 +351,60 @@
     </div>
   </section>
 
+<section class="volunteer-form-section">
+  <div class="wrap">
+    <div class="eyebrow">Join our community</div>
+    <h2 style="text-align:center;color:#18352b;">
+      Volunteer Application
+    </h2>
+    <p style="text-align:center;">
+      Tell us a little about yourself and how you would like to contribute.
+    </p>
+
+    <form class="volunteer-form" onsubmit="return sendVolunteerEmail(event)">
+
+      <label for="vol-name">Full Name</label>
+      <input type="text" id="vol-name" required placeholder="Enter your full name">
+
+      <label for="vol-email">Email Address</label>
+      <input type="email" id="vol-email" required placeholder="Enter your email">
+
+      <label for="vol-phone">Phone / WhatsApp Number</label>
+      <input type="tel" id="vol-phone" required placeholder="Enter your phone number">
+
+      <label for="vol-location">Your Location</label>
+      <input type="text" id="vol-location" required placeholder="District or town">
+
+      <label for="vol-interest">How would you like to help?</label>
+      <select id="vol-interest" required>
+        <option value="">Select an area</option>
+        <option>Supporting children and education</option>
+        <option>Family and community support</option>
+        <option>Community outreach</option>
+        <option>Fundraising and partnerships</option>
+        <option>Professional skills and expertise</option>
+        <option>Other</option>
+      </select>
+
+      <label for="vol-skills">Your Skills or Experience</label>
+      <textarea id="vol-skills" placeholder="Tell us about your skills or experience"></textarea>
+
+      <label for="vol-message">Why would you like to volunteer?</label>
+      <textarea id="vol-message" required placeholder="Tell us why you would like to join us"></textarea>
+
+      <button type="submit" class="button">
+        Submit Volunteer Application
+      </button>
+
+      <p style="font-size:13px;color:#68736e;">
+        Submitting opens your email application with your details prepared.
+        You will need to send the email to complete your application.
+      </p>
+
+    </form>
+  </div>
+</section>
+
   <section class="cta">
     <div class="wrap">
       <h2>Would you like to volunteer?</h2>
@@ -332,6 +431,35 @@
     Brighter Future Foundation — Together We Can Make a Difference.
   </div>
 </footer>
+
+<script>
+function sendVolunteerEmail(event) {
+  event.preventDefault();
+
+  const fields = [
+    ["Full Name", "vol-name"],
+    ["Email", "vol-email"],
+    ["Phone / WhatsApp", "vol-phone"],
+    ["Location", "vol-location"],
+    ["Area of Interest", "vol-interest"],
+    ["Skills and Experience", "vol-skills"],
+    ["Reason for Volunteering", "vol-message"]
+  ];
+
+  const body = fields.map(([label, id]) =>
+    label + ": " + document.getElementById(id).value
+  ).join("\n\n");
+
+  const subject = encodeURIComponent("Volunteer Application - Brighter Future Foundation");
+  const message = encodeURIComponent(body);
+
+  window.location.href =
+    "mailto:brighterfuturefoundation85@gmail.com?subject=" +
+    subject + "&body=" + message;
+
+  return false;
+}
+</script>
 
 </body>
 </html>
