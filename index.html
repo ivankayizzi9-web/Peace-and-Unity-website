@@ -801,7 +801,7 @@ header.nav .brand strong:last-child {
   header.nav .nav-links {
   display: none;
   position: absolute;
-  top: 55px;
+ top: 145px;
   left: 10px;
   width: 220px;
   max-width: calc(100vw - 30px);
@@ -1799,7 +1799,16 @@ if(contactForm){
       menuToggle.setAttribute('aria-expanded', isOpen);
       menuToggle.textContent = isOpen ? '✕' : '☰';
     });
-
+document.addEventListener('click', (event) => {
+  if (
+    !menuToggle.contains(event.target) &&
+    !navLinks.contains(event.target)
+  ) {
+    navLinks.classList.remove('open');
+    menuToggle.setAttribute('aria-expanded', 'false');
+    menuToggle.textContent = '☰';
+  }
+});
     navLinks.querySelectorAll('a').forEach(link => {
       link.addEventListener('click', () => {
         navLinks.classList.remove('open');
