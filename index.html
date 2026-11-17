@@ -915,15 +915,21 @@ header.nav .nav-links.open {
     text-align: center;
   }
 }
-  @media (max-width: 700px) {
+ @media (max-width: 700px) {
   .mission-grid > div:first-child {
-    text-align: center;
+    text-align: center !important;
     width: 100%;
   }
 
-  .mission-grid > div:first-child .eyebrow,
+  .mission-grid > div:first-child .eyebrow {
+    display: block !important;
+    width: 100%;
+    text-align: center !important;
+    margin: 0 auto 12px;
+  }
+
   .mission-grid > div:first-child h2 {
-    text-align: center;
+    text-align: center !important;
   }
 }
 </style>
