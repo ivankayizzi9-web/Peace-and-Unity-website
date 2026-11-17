@@ -1044,6 +1044,58 @@ header.nav .nav-links.open {
   background: #0d3970 !important;
   color: #ffffff !important;
 }
+  
+/* Improve donation payment cards */
+.payment-cards {
+  gap: 24px;
+  margin-top: 28px;
+}
+
+.support-method {
+  min-width: 0;
+  border-radius: 18px;
+  overflow: hidden;
+}
+
+.support-content {
+  padding: 22px;
+}
+
+.support-detail {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  padding: 12px;
+  border-radius: 10px;
+  background: #f4f7f4;
+  margin-top: 10px;
+}
+
+@media (max-width: 768px) {
+  .payment-cards {
+    grid-template-columns: 1fr;
+    gap: 18px;
+  }
+
+  .support-content {
+    padding: 18px;
+  }
+
+  .payment-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .payment-actions .button {
+    width: 100%;
+    min-height: 48px;
+    justify-content: center;
+    text-align: center;
+  }
+}
+
 </style>
 </head>
 <body>
