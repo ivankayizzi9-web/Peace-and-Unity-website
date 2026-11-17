@@ -964,6 +964,36 @@ header.nav .nav-links.open {
     font-size: 14px;
   }
 }
+  /* Back to top button */
+.back-to-top {
+  position: fixed;
+  right: 20px;
+  bottom: 85px;
+  z-index: 9998;
+  width: 46px;
+  height: 46px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #18352b;
+  color: #ffffff;
+  border-radius: 50%;
+  font-size: 26px;
+  font-weight: bold;
+  text-decoration: none;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+}
+
+.back-to-top:hover {
+  background: #b98b4a;
+}
+
+@media (max-width: 700px) {
+  .back-to-top {
+    right: 14px;
+    bottom: 75px;
+  }
+}
 </style>
 </head>
 <body>
@@ -1961,5 +1991,7 @@ document.addEventListener('click', (event) => {
   }
 </script><a href="#give" class="floating-donate">
   Make a Gift
+</a><a href="#top" class="back-to-top" aria-label="Back to top">
+  ↑
 </a></body>
 </html>
