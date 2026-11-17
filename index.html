@@ -843,7 +843,9 @@ header.nav .nav-links.open {
   }
 }
   /* Mobile homepage hero improvements */
-@media (max-width: 700px) {
+@media (max-width: 700px) {.hero .eyebrow::before {
+  display: none !important;
+}
 
   .hero {
     display: flex;
@@ -901,6 +903,10 @@ header.nav .nav-links.open {
     display: block;
     object-fit: contain;
   }
+}
+  /* Remove decorative line before What We Stand For */
+.mission .eyebrow::before {
+  display: none !important;
 }
 </style>
 </head>
