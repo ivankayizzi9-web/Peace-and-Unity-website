@@ -934,6 +934,36 @@ header.nav .nav-links.open {
     text-align: center !important;
   }
 }
+  /* Floating donation button */
+.floating-donate {
+  position: fixed;
+  right: 20px;
+  bottom: 22px;
+  z-index: 9999;
+  background: #b98b4a;
+  color: #ffffff;
+  padding: 15px 24px;
+  border-radius: 999px;
+  font-size: 15px;
+  font-weight: 800;
+  text-decoration: none;
+  box-shadow: 0 5px 18px rgba(0,0,0,0.22);
+  transition: all 0.2s ease;
+}
+
+.floating-donate:hover {
+  background: #18352b;
+  transform: translateY(-2px);
+}
+
+@media (max-width: 700px) {
+  .floating-donate {
+    right: 14px;
+    bottom: 16px;
+    padding: 13px 20px;
+    font-size: 14px;
+  }
+}
 </style>
 </head>
 <body>
@@ -1929,5 +1959,7 @@ document.addEventListener('click', (event) => {
       });
     });
   }
-</script></body>
+</script><a href="#give" class="floating-donate">
+  Make a Gift
+</a></body>
 </html>
