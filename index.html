@@ -994,6 +994,44 @@ header.nav .nav-links.open {
     bottom: 75px;
   }
 }
+  /* Keep floating buttons visible */
+.floating-donate,
+.back-to-top {
+  display: flex !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  position: fixed !important;
+  z-index: 99999 !important;
+  cursor: pointer;
+}
+
+/* Make Gift button */
+.floating-donate {
+  right: 20px;
+  bottom: 22px;
+}
+
+/* Back to Top button */
+.back-to-top {
+  right: 20px;
+  bottom: 85px;
+  width: 46px;
+  height: 46px;
+  align-items: center;
+  justify-content: center;
+}
+
+@media (max-width: 700px) {
+  .floating-donate {
+    right: 14px;
+    bottom: 16px;
+  }
+
+  .back-to-top {
+    right: 14px;
+    bottom: 75px;
+  }
+}
 </style>
 </head>
 <body>
