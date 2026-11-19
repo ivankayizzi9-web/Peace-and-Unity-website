@@ -289,7 +289,7 @@ try {
   });
   const result=await verifyResponse.json();
   turnstileValid=verifyResponse.ok && result.success===true;
-} catch {
+} catch (error) {
   turnstileValid=false;
 }
 if (!turnstileValid) return redirect("/reset-password?error=1");
