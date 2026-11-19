@@ -191,7 +191,7 @@ async function handle(req,env) {
   }
   if (p==="/login"&&m==="GET") {
     const s=await session(req,env); if (s) return redirect("/dashboard");
-    return page("Admin Login",`<main class="wrap login"><section class="card"><div class="brand">🌱</div><h1>Admin login</h1><p class="muted">Private management area for Brighter Future Foundation.</p>${u.searchParams.has("error")?'<p class="notice warning">Login details could not be verified.</p>':""}${u.searchParams.has("changed")?'<p class="notice">Your password has been changed. Please sign in.</p>':""}<form method="post" action="/login"><label>Email</label><input name="email" type="email" autocomplete="username" required><label>Password</label><input name="password" type="password" autocomplete="current-password" required><button type="submit">Sign in</button></form><p><a href="/forgot-password">Forgot password?</a></p></section></main>`);
+    return page("Admin Login",`<main class="wrap login"><section class="card"><div class="brand">🌱</div><h1>Admin login</h1><p class="muted">Private management area for Brighter Future Foundation.</p>${u.searchParams.has("error")?'<p class="notice warning">Login details could not be verified.</p>':""}${u.searchParams.has("changed")?'<p class="notice">Your password has been changed. Please sign in.</p>':""}<form method="post" action="/login"><label>Email</label><input name="email" type="email" autocomplete="username" required><label>Password</label><input name="password" type="password" autocomplete="current-password" required><div class="cf-turnstile" data-sitekey="0x4AAAAAAF1cl1stNGFE_eSK"></div> <button type="submit">Sign in</button></form><p><a href="/forgot-password">Forgot password?</a></p></section></main><script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>`);
   }
   if (p==="/login"&&m==="POST") {
     const origin=req.headers.get("Origin");
@@ -210,7 +210,7 @@ async function handle(req,env) {
     await env.DB.prepare("INSERT INTO sessions(token_hash,csrf,expires_at) VALUES(?,?,?)").bind(await digest(token),csrf,Date.now()+28800000).run();
     return new Response(null,{status:303,headers:{Location:"/dashboard","Set-Cookie":setCookie(token)}});
   }
-  if (p==="/forgot-password"&&m==="GET") return page("Forgot Password",`<main class="wrap login"><section class="card"><h1>Forgot password?</h1><p class="muted">Enter the admin email address. If recovery is configured, a reset link will be sent.</p><form method="post"><label>Admin email</label><input type="email" name="email" required><button>Send reset link</button></form><p><a href="/login">Back to login</a></p></section></main>`);
+  if (p==="/forgot-password"&&m==="GET") return page("Forgot Password",`<main class="wrap login"><section class="card"><h1>Forgot password?</h1><p class="muted">Enter the admin email address. If recovery is configured, a reset link will be sent.</p><form method="post"><label>Admin email</label><input type="email" name="email" required><button>Send reset link</button></form><p><a href="/login">Back to login</a></p></section></main><script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>`);
   if (p==="/forgot-password"&&m==="POST") {
     const f=await formData(req),email=String(f.get("email")||"").trim().toLowerCase(),admin=(env.ADMIN_EMAIL||"brighterfuturefoundation85@gmail.com").toLowerCase(),ip=req.headers.get("CF-Connecting-IP")||"unknown";
     if (await limit(env.DB,"reset:"+ip,4) && email===admin && env.RESEND_API_KEY && env.ADMIN_URL) {
@@ -223,7 +223,7 @@ async function handle(req,env) {
   if (p==="/reset-password"&&m==="GET") {
     const token=u.searchParams.get("token")||"",r=await env.DB.prepare("SELECT expires_at,used FROM reset_tokens WHERE token_hash=?").bind(await digest(token)).first();
     if (!r||r.used||r.expires_at<Date.now()) return page("Reset Link Expired",'<main class="wrap login"><section class="card"><h1>Reset link unavailable</h1><p class="muted">This link is invalid or has expired. Request a new one.</p><a href="/forgot-password">Request another link</a></section></main>');
-    return page("Choose New Password",`<main class="wrap login"><section class="card"><h1>Choose a new password</h1><form method="post"><input type="hidden" name="token" value="${htmlEscape(token)}"><label>New password (at least 12 characters)</label><input type="password" name="password" minlength="12" required><label>Confirm password</label><input type="password" name="confirm" minlength="12" required><button>Save new password</button></form></section></main>`);
+    return page("Choose New Password",`<main class="wrap login"><section class="card"><h1>Choose a new password</h1><form method="post"><input type="hidden" name="token" value="${htmlEscape(token)}"><label>New password (at least 12 characters)</label><input type="password" name="password" minlength="12" required><label>Confirm password</label><input type="password" name="confirm" minlength="12" required><button>Save new password</button></form></section></main><script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>`);
   }
   if (p==="/reset-password"&&m==="POST") {
     const f=await formData(req),token=String(f.get("token")||""),pw=String(f.get("password")||""),confirm=String(f.get("confirm")||""),hash=await digest(token);
