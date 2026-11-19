@@ -292,11 +292,7 @@ try {
 } catch {
   turnstileValid=false;
 }
-
-
-      const result=await verifyResponse.json();
-      turnstileValid=verifyResponse.ok && result.success===true;
-    } catch {
+if (!turnstileValid) return redirect("/reset-password?error=1");
 
     if (!token||pw.length<12||pw!==confirm) return page("Unable to Reset",'<main class="wrap login"><section class="card"><p class="muted">The reset link or password details are invalid. Please try again.</p><a href="/forgot-password">Request a new link</a></section></main>');
     const claim=await env.DB.prepare("UPDATE reset_tokens SET used=1 WHERE token_hash=? AND used=0 AND expires_at>?").bind(hash,Date.now()).run();
