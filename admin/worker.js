@@ -233,9 +233,30 @@ async function handle(req,env) {
     await env.DB.prepare("INSERT INTO sessions(token_hash,csrf,expires_at) VALUES(?,?,?)").bind(await digest(token),csrf,Date.now()+28800000).run();
     return new Response(null,{status:303,headers:{Location:"/dashboard","Set-Cookie":setCookie(token)}});
   }
-  if (p==="/forgot-password"&&m==="GET") return page("Forgot Password",`<main class="wrap login"><section class="card"><h1>Forgot password?</h1><p class="muted">Enter the admin email address. If recovery is configured, a reset link will be sent.</p><form method="post"><label>Admin email</label><input type="email" name="email" required><button>Send reset link</button></form><p><a href="/login">Back to login</a></p></section></main><script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>`);
+  if (p==="/forgot-password"&&m==="GET") return page("Forgot Password",`<main class="wrap login"><section class="card"><h1>Forgot password?</h1><p class="muted">Enter the admin email address. If recovery is configured, a reset link will be sent.</p><form method="post"> <label>Admin email</label> <input type="email" name="email" required> <div class="cf-turnstile" data-sitekey="0x4AAAAAAF1cl1stNGFE_eSK"></div> <button>Send reset link</button> </form><p><a href="/login">Back to login</a></p></section></main><script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>`);
   if (p==="/forgot-password"&&m==="POST") {
     const f=await formData(req),email=String(f.get("email")||"").trim().toLowerCase(),admin=(env.ADMIN_EMAIL||"brighterfuturefoundation85@gmail.com").toLowerCase(),ip=req.headers.get("CF-Connecting-IP")||"unknown";
+        const turnstileToken=String(f.get("cf-turnstile-response")||"");
+    if (!env.TURNSTILE_SECRET_KEY || !turnstileToken) return redirect("/forgot-password?error=1");
+
+    let turnstileValid=false;
+    try {
+      const verifyResponse=await fetch("https://challenges.cloudflare.com/turnstile/v0/siteverify",{
+        method:"POST",
+        headers:{"Content-Type":"application/x-www-form-urlencoded"},
+        body:new URLSearchParams({
+          secret:env.TURNSTILE_SECRET_KEY,
+          response:turnstileToken,
+          remoteip:ip
+        })
+      });
+      const result=await verifyResponse.json();
+      turnstileValid=verifyResponse.ok && result.success===true;
+    } catch {
+      turnstileValid=false;
+    }
+
+    if (!turnstileValid) return redirect("/forgot-password?error=1");
     if (await limit(env.DB,"reset:"+ip,4) && email===admin && env.RESEND_API_KEY && env.ADMIN_URL) {
       const token=crypto.randomUUID()+crypto.randomUUID();
       await env.DB.prepare("INSERT INTO reset_tokens(token_hash,expires_at,used) VALUES(?,?,0)").bind(await digest(token),Date.now()+1800000).run();
@@ -246,10 +267,37 @@ async function handle(req,env) {
   if (p==="/reset-password"&&m==="GET") {
     const token=u.searchParams.get("token")||"",r=await env.DB.prepare("SELECT expires_at,used FROM reset_tokens WHERE token_hash=?").bind(await digest(token)).first();
     if (!r||r.used||r.expires_at<Date.now()) return page("Reset Link Expired",'<main class="wrap login"><section class="card"><h1>Reset link unavailable</h1><p class="muted">This link is invalid or has expired. Request a new one.</p><a href="/forgot-password">Request another link</a></section></main>');
-    return page("Choose New Password",`<main class="wrap login"><section class="card"><h1>Choose a new password</h1><form method="post"><input type="hidden" name="token" value="${htmlEscape(token)}"><label>New password (at least 12 characters)</label><input type="password" name="password" minlength="12" required><label>Confirm password</label><input type="password" name="confirm" minlength="12" required><button>Save new password</button></form></section></main><script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>`);
+    return page("Choose New Password",`<main class="wrap login"><section class="card"><h1>Choose a new password</h1><form method="post"><input type="hidden" name="token" value="${htmlEscape(token)}"><label>New password (at least 12 characters)</label><input type="password" name="password" minlength="12" required><label>Confirm password</label> <input type="password" name="confirm" minlength="12" required> <div class="cf-turnstile" data-sitekey="0x4AAAAAAF1cl1stNGFE_eSK"></div> <button>Save new password</button></form></section></main><script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>`);
   }
   if (p==="/reset-password"&&m==="POST") {
-    const f=await formData(req),token=String(f.get("token")||""),pw=String(f.get("password")||""),confirm=String(f.get("confirm")||""),hash=await digest(token);
+   const f=await formData(req),token=String(f.get("token")||""),pw=String(f.get("password")||""),confirm=String(f.get("confirm")||""),hash=await digest(token);
+const ip=req.headers.get("CF-Connecting-IP")||"unknown";
+
+const turnstileToken=String(f.get("cf-turnstile-response")||"");
+if (!env.TURNSTILE_SECRET_KEY || !turnstileToken) return redirect("/reset-password?error=1");
+
+let turnstileValid=false;
+try {
+  const verifyResponse=await fetch("https://challenges.cloudflare.com/turnstile/v0/siteverify",{
+    method:"POST",
+    headers:{"Content-Type":"application/x-www-form-urlencoded"},
+    body:new URLSearchParams({
+      secret:env.TURNSTILE_SECRET_KEY,
+      response:turnstileToken,
+      remoteip:ip
+    })
+  });
+  const result=await verifyResponse.json();
+  turnstileValid=verifyResponse.ok && result.success===true;
+} catch {
+  turnstileValid=false;
+}
+
+
+      const result=await verifyResponse.json();
+      turnstileValid=verifyResponse.ok && result.success===true;
+    } catch {
+
     if (!token||pw.length<12||pw!==confirm) return page("Unable to Reset",'<main class="wrap login"><section class="card"><p class="muted">The reset link or password details are invalid. Please try again.</p><a href="/forgot-password">Request a new link</a></section></main>');
     const claim=await env.DB.prepare("UPDATE reset_tokens SET used=1 WHERE token_hash=? AND used=0 AND expires_at>?").bind(hash,Date.now()).run();
     if (!claim.meta||claim.meta.changes!==1) return page("Unable to Reset",'<main class="wrap login"><section class="card"><p class="muted">This reset link is invalid, expired or already used. Please request a new one.</p><a href="/forgot-password">Request a new link</a></section></main>');
