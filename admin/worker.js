@@ -199,6 +199,29 @@ async function handle(req,env) {
     const ip=req.headers.get("CF-Connecting-IP")||"unknown";
     if (!await limit(env.DB,"login:"+ip,8)) return redirect("/login?error=1");
     const f=await formData(req),email=String(f.get("email")||"").trim().toLowerCase(),pw=String(f.get("password")||"");
+    
+    const turnstileToken=String(f.get("cf-turnstile-response")||"");
+    if (!env.TURNSTILE_SECRET_KEY || !turnstileToken) return redirect("/login?error=1");
+
+    let turnstileValid=false;
+    try {
+      const verifyResponse=await fetch("https://challenges.cloudflare.com/turnstile/v0/siteverify",{
+        method:"POST",
+        headers:{"Content-Type":"application/x-www-form-urlencoded"},
+        body:new URLSearchParams({
+          secret:env.TURNSTILE_SECRET_KEY,
+          response:turnstileToken,
+          remoteip:ip
+        })
+      });
+      const result=await verifyResponse.json();
+      turnstileValid=verifyResponse.ok && result.success===true;
+    } catch {
+      turnstileValid=false;
+    }
+
+    if (!turnstileValid) return redirect("/login?error=1");
+
     const admin=(env.ADMIN_EMAIL||"brighterfuturefoundation85@gmail.com").toLowerCase();
     let stored=(await env.DB.prepare("SELECT value FROM admin_config WHERE key='password_hash'").first())?.value||"";
     if (!stored && env.ADMIN_INITIAL_PASSWORD) {
