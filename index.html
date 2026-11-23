@@ -1173,6 +1173,53 @@ header.nav .nav-links.open {
   margin: 0 0 28px;
   max-width: 100%;
 }
+  /* Balance the Community Pictures and Videos cards */
+.media-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: stretch;
+  gap: 20px;
+}
+
+.media-card {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+}
+
+.media-visual,
+.media-visual:not(.video) {
+  height: 315px;
+  min-height: 315px;
+}
+
+.media-visual:not(.video) img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.media-body {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.media-body p {
+  flex-grow: 1;
+}
+
+.media-link {
+  align-self: flex-start;
+  margin-top: 16px;
+}
+
+@media (max-width: 800px) {
+  .media-grid {
+    grid-template-columns: 1fr;
+  }
+}
 </style>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
 </head>
