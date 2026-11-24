@@ -1304,6 +1304,25 @@ header.nav .nav-links.open {
   display: block;
   border-radius: inherit;
 }
+  .story-mobile-photo {
+  display: none;
+}
+
+@media (max-width: 700px) {
+  .story-art {
+    display: none;
+  }
+
+  .story-mobile-photo {
+    display: block;
+    width: 100%;
+    height: 310px;
+    object-fit: cover;
+    object-position: center top;
+    border-radius: 18px;
+    margin: 20px 0;
+  }
+}
 </style>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
 </head>
@@ -1391,7 +1410,7 @@ header.nav .nav-links.open {
     </p>
   </div>
 </section>
-<section class="wrap story" id="story"><div class="story-art"></div<div class="story-copy"><div class="eyebrow">My personal story</div><h2>Tears Behind Our Smiles</h2><img
+<section class="wrap story" id="story"><div class="story-art">  </div<div class="story-copy"><div class="eyebrow">My personal story</div><h2>Tears Behind Our Smiles</h2><img
   class="story-mobile-photo"
   src="assets/Professional Portrait in Courtyard Setting.png"
   alt="Ivan Kayizzi, founder of Brighter Future Foundation"
