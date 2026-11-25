@@ -1304,23 +1304,19 @@ header.nav .nav-links.open {
   display: block;
   border-radius: inherit;
 }
-  .story-mobile-photo {
-  display: none;
+ .story-mobile-photo {
+  display: block;
+  width: min(100%, 360px);
+  height: 310px;
+  object-fit: cover;
+  object-position: center top;
+  border-radius: 18px;
+  margin: 20px auto;
 }
 
 @media (max-width: 700px) {
   .story-art {
     display: none;
-  }
-
-  .story-mobile-photo {
-    display: block;
-    width: 100%;
-    height: 310px;
-    object-fit: cover;
-    object-position: center top;
-    border-radius: 18px;
-    margin: 20px 0;
   }
 }
 </style>
