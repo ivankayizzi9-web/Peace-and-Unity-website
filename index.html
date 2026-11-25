@@ -1334,6 +1334,57 @@ header.nav .nav-links.open {
   max-width: 100%;
   box-sizing: border-box;
 }
+  .founder-section {
+  padding: 70px 0;
+  background: #f5f2e9;
+}
+
+.founder-layout {
+  display: grid;
+  grid-template-columns: minmax(260px, 360px) 1fr;
+  gap: 48px;
+  align-items: center;
+}
+
+.founder-photo img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 4 / 5;
+  object-fit: cover;
+  object-position: center top;
+  border-radius: 20px;
+}
+
+.founder-intro {
+  max-width: 720px;
+}
+
+.founder-role {
+  font-weight: 600;
+  color: #27634e;
+}
+
+.founder-button {
+  display: inline-block;
+  margin-top: 16px;
+  padding: 13px 24px;
+  background: #27634e;
+  color: #ffffff;
+  border-radius: 30px;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+@media (max-width: 700px) {
+  .founder-layout {
+    grid-template-columns: 1fr;
+    gap: 25px;
+  }
+
+  .founder-photo img {
+    max-width: 360px;
+  }
+}
 </style>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
 </head>
@@ -1428,10 +1479,6 @@ header.nav .nav-links.open {
     <div class="eyebrow">My personal story</div>
     <h2>Tears Behind Our Smiles</h2>
 
-    <img
-      class="story-mobile-photo"
-      src="assets/Professional Portrait in Courtyard Setting.png"
-      alt="Ivan Kayizzi, founder of Brighter Future Foundation"
     ><p><strong>By Ivan Kayizzi</strong></p>
 <p>I was born into a life of struggle. My mother raised us as a single mother, doing everything she could to give us a better life.</p>
 <p>We grew up in a small house, where life was never easy. School was very far from home, and paying school fees was a constant struggle. Sometimes, we had no choice but to walk long distances to school barefoot.</p>
@@ -1454,6 +1501,35 @@ header.nav .nav-links.open {
 <p><strong>My dream is simple: to give others the hope, opportunities, and support that many people, including my own family, once desperately needed.</strong></p>
 <p>Because I know what it means to struggle, I never want to ignore someone else’s struggle.</p>
 <div class="quote">“Brighter Future Foundation — Supporting Children, Education &amp; Families.”<small>— Ivan Kayizzi</small></div></div></section>
+
+  
+<section class="founder-section" id="founder">
+  <div class="wrap founder-layout">
+
+    <div class="founder-photo">
+      <img
+        src="assets/Professional Portrait in Courtyard Setting.png"
+        alt="Ivan Kayizzi, founder of Brighter Future Foundation"
+      >
+    </div>
+
+    <div class="founder-intro">
+      <div class="eyebrow">Meet Our Founder</div>
+      <h2>A Personal Journey. A Brighter Future.</h2>
+      <h3>Ivan Kayizzi</h3>
+      <p class="founder-role">Founder of Brighter Future Foundation</p>
+
+      <p>
+        Inspired by personal experiences of hardship, hope and resilience,
+        Ivan Kayizzi founded Brighter Future Foundation with a belief that
+        every child and family deserves an opportunity for a better future.
+      </p>
+
+      <a href="#story" class="founder-button">Read My Story</a>
+    </div>
+
+  </div>
+</section>
 
 <section class="impact" id="impact">
 <div class="wrap">
